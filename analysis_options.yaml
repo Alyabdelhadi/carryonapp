@@ -1,0 +1,52 @@
+# This file configures the analyzer, which statically analyzes Dart code to
+# check for errors, warnings, and lints.
+include: package:flutter_lints/flutter.yaml
+
+# WHY: Dart's native analyzer plugin system (top-level `plugins:`), which
+# resolves each plugin's dependencies in its own context — the plugins do
+# not appear in pubspec.yaml on purpose. The legacy `analyzer: plugins:`
+# custom_lint loader must stay absent: the two systems are mutually
+# exclusive, and a legacy entry silently disables every native plugin.
+plugins:
+  flutter_guardian:
+    path: packages/flutter_guardian
+    diagnostics:
+      # Every visible string goes through the ARB files (English + Arabic);
+      # server-managed copy passes its l10n key as the fallback.
+      hardcoded_text: true
+  riverpod_lint:
+    diagnostics:
+      # WHY: the template's DI design reads auto-dispose use-case
+      # providers once inside keepAlive providers. This rule flags that
+      # pattern; disabled until the team decides to restructure.
+      only_use_keep_alive_inside_keep_alive: false
+
+linter:
+  rules:
+    - unawaited_futures
+    - await_only_futures
+    - prefer_const_constructors
+    - sort_unnamed_constructors_first
+    - sort_constructors_first
+    - prefer_const_constructors_in_immutables
+    - prefer_single_quotes
+    - prefer_relative_imports
+    - lines_longer_than_80_chars
+
+formatter:
+  page_width: 80
+  trailing_commas: automate
+
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
+    - lib/src/presentation/core/gen/**
+    # WHY: the linter package resolves its own dependencies; analyzing it
+    # from the app root reports every import as missing.
+    - packages/**

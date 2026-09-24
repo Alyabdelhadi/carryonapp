@@ -1,0 +1,725 @@
+{
+  "@@locale": "en",
+  "appTitle": "CarryOn",
+  "home": "Home",
+  "packages": "Packages",
+  "trips": "Trips",
+  "account": "Account",
+  "login": "Login",
+  "logout": "Logout",
+  "signUp": "Sign up",
+  "retry": "Retry",
+  "signInAgain": "Sign in again",
+  "goHome": "Go home",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "ok": "OK",
+  "somethingWentWrong": "Something went wrong",
+  "noRouteFor": "No route for {uri}",
+  "@noRouteFor": {
+    "placeholders": {
+      "uri": {
+        "type": "String"
+      }
+    }
+  },
+  "failureUnauthenticated": "Your session has ended. Please sign in again.",
+  "failurePermissionDenied": "You do not have permission to do that.",
+  "failureUnreachable": "We could not reach the server. Check your connection and try again.",
+  "failureInvalidInput": "Please check the details you entered.",
+  "failureNotFound": "We could not find what you were looking for.",
+  "failureConflict": "That change conflicts with the current state. Please try again.",
+  "failureCancelled": "The request was cancelled.",
+  "failureUnexpected": "Something went wrong. Please try again.",
+  "isRequired": "This field is required",
+  "emailRequired": "Email is required",
+  "passwordRequired": "Password is required",
+  "validEmail": "Enter a valid email address",
+  "minLengthValidation": "Must be at least {min} characters",
+  "@minLengthValidation": {
+    "placeholders": {
+      "min": {
+        "type": "int",
+        "example": "6"
+      }
+    }
+  },
+  "maxLengthValidation": "Must be at most {max} characters",
+  "@maxLengthValidation": {
+    "placeholders": {
+      "max": {
+        "type": "int",
+        "example": "20"
+      }
+    }
+  },
+  "passwordMinLengthValidation": "Password must be at least {minLength} characters",
+  "@passwordMinLengthValidation": {
+    "placeholders": {
+      "minLength": {
+        "type": "String"
+      }
+    }
+  },
+  "passwordNumberValidation": "Password must contain a number",
+  "passwordLowerCaseValidation": "Password must contain a lowercase letter",
+  "passwordUpperCaseValidation": "Password must contain an uppercase letter",
+  "passwordSpecialCharValidation": "Password must contain a special character",
+  "passwordMismatchValidation": "Passwords do not match",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "done": "Done",
+  "close": "Close",
+  "back": "Back",
+  "next": "Next",
+  "continueLabel": "Continue",
+  "yes": "Yes",
+  "no": "No",
+  "loading": "Loading…",
+  "search": "Search",
+  "select": "Select",
+  "skip": "Skip",
+  "areYouSure": "Are you sure?",
+  "optional": "Optional",
+  "required": "Required",
+  "free": "Free",
+  "newRating": "New",
+  "kmUnit": "km",
+  "kgUnit": "kg",
+  "language": "Language",
+  "selectLanguage": "Choose your language",
+  "noInternet": "No internet connection",
+  "noInternetDescription": "Check your connection and try again.",
+  "statusUnassigned": "Unassigned",
+  "statusAssigned": "Assigned",
+  "statusPicked": "Picked up",
+  "statusTransit": "In transit",
+  "statusDelivered": "Delivered",
+  "statusCancelled": "Cancelled",
+  "statusExpired": "Expired",
+  "statusUnknown": "Unknown",
+  "tripFrequencyOneTime": "One-time trip",
+  "tripFrequencyDaily": "Daily",
+  "tripFrequencyWeekdays": "Weekdays",
+  "tripFrequencyWeekends": "Weekends",
+  "identityDeclined": "Identity verification failed. Please retake your photos and try again.",
+  "identityUnreadable": "We could not read your photos. Please retake them in good light and try again.",
+  "identityUnreadableDetail": "We could not read your photos: {detail}",
+  "@identityUnreadableDetail": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "identityUnreachable": "Verification error. Please try again.",
+  "homeGreetingGuest": "Hello, Guest 😊",
+  "homeGreeting": "Hello, {name} 😊",
+  "@homeGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeHeadline": "Send it, get it, or carry it.",
+  "homeMatchingPackagesTooltip": "Matching packages",
+  "homeMyTripsTooltip": "My trips",
+  "homeRefreshPage": "Refresh Page",
+  "homeUpdateAvailableTitle": "🚀 Update Available",
+  "homeUpdateAvailableBody": "New Version {latestVersion}!\n\nA new version is available! You're currently on version {currentVersion}. Update now to get the latest features and improvements.",
+  "@homeUpdateAvailableBody": {
+    "placeholders": {
+      "latestVersion": {
+        "type": "String"
+      },
+      "currentVersion": {
+        "type": "String"
+      }
+    }
+  },
+  "homeRemindTomorrow": "Remind Tomorrow",
+  "homeUpdateNow": "✨ Update Now",
+  "homeUpdateReminderToast": "⏰ We'll check for updates again tomorrow",
+  "coreSignInToContinue": "Sign in to continue",
+  "coreLoginToAccessPage": "Please login to access this page.",
+  "coreAddressTitle": "Address",
+  "authWelcomeTitle": "Welcome to {app}",
+  "@authWelcomeTitle": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "authLoginSubtitle": "Sign in to your account",
+  "authLoginValidation": "Please enter valid details",
+  "authLoginError": "Sorry! Invalid login details",
+  "authEmail": "Email",
+  "authPassword": "Password",
+  "authFullName": "Full Name",
+  "authPhoneNumber": "Phone number",
+  "authForgotPassword": "Forgot Password?",
+  "authForgotSubtitle": "Don't worry, you can reset it here",
+  "authEnterRegisteredEmail": "Enter Registered Email",
+  "authReset": "Reset",
+  "authResetLinkSent": "A reset link has been sent to your email address",
+  "authJoinPrompt": "Do you want to join {app}?",
+  "@authJoinPrompt": {
+    "placeholders": {
+      "app": {
+        "type": "String"
+      }
+    }
+  },
+  "authSignupTitle": "Join The Next Big Thing",
+  "authSignupSubtitle": "Create your account",
+  "authFullNameRequired": "Please enter your full name",
+  "authPhoneRequired": "Please enter your phone number",
+  "authUploadBothDocuments": "Please upload both a selfie and an identity document.",
+  "authSelfieTitle": "Upload a Selfie",
+  "authSelfieSubtitle": "Verify your liveliness",
+  "authIdentityTitle": "Upload ID/Passport",
+  "authIdentitySubtitle": "Photo or PDF of your ID, passport or licence",
+  "authAgreeToThe": "I agree to the",
+  "authTermsAndConditions": "Terms & Conditions",
+  "authSecurityNote": "Your documents and information are encrypted and processed securely",
+  "authVerifyingIdentity": "Verifying identity...",
+  "authCreatingAccount": "Creating account...",
+  "authSearchCountry": "Search country...",
+  "authNoCountryFound": "No country found",
+  "authCouldNotOpenFile": "Could not open that file. Try another.",
+  "authPreparing": "Preparing…",
+  "authRemove": "Remove",
+  "authTakePhoto": "Take a photo",
+  "authChooseFromGallery": "Choose from gallery",
+  "authChooseFile": "Choose a file",
+  "authAnyImageOrPdf": "Any image or a PDF",
+  "authShowPassword": "Show password",
+  "authHidePassword": "Hide password",
+  "pkgAddressPickLocation": "Please pick a location on the map.",
+  "pkgMatchingTitle": "AI Matched Packages",
+  "pkgAcceptConfirmTitle": "Are you sure you want to accept?",
+  "pkgAcceptConfirmMessage": "Please make sure it reaches its destination safely and on time.",
+  "pkgGoBack": "Go back",
+  "pkgMatchingEmptyTitle": "No matching packages yet.",
+  "pkgAddTripMatchMessage": "Add a trip and we will match you with packages on your route.",
+  "pkgAddNewTrip": "Add New Trip",
+  "pkgMatchingFilterEmptyTitle": "No packages on this route.",
+  "pkgMatchingFilterEmptyMessage": "Try another From / To combination.",
+  "pkgPlaceCityCountry": "{city}, {country}",
+  "@pkgPlaceCityCountry": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      },
+      "country": {
+        "type": "String"
+      }
+    }
+  },
+  "pkgMyPackages": "My Packages",
+  "pkgCarriedPackages": "Carried Packages",
+  "pkgCreatedEmptyTitle": "You don't have any packages yet.",
+  "pkgCreatedEmptyMessage": "Packages you send or receive with {appName} show up here.",
+  "@pkgCreatedEmptyMessage": {
+    "placeholders": {
+      "appName": {
+        "type": "String"
+      }
+    }
+  },
+  "pkgCarriedEmptyTitle": "You are not carrying any packages at the moment.",
+  "pkgSuccessAllDone": "All Done",
+  "pkgSuccessCancelledTitle": "Package Cancelled",
+  "pkgSuccessPlacedMessage": "Your package has been successfully placed.",
+  "pkgSuccessAcceptedMessage": "The package has been successfully added to your carried packages.",
+  "pkgSuccessCancelledMessage": "Package has been successfully cancelled.",
+  "pkgSuccessPlacedHint": "We will notify you as soon as a carrier on your route picks it up.",
+  "pkgSuccessAcceptedHint": "Find it under Carried Packages and keep the sender posted.",
+  "pkgSuccessCancelledHint": "You can post a new package any time.",
+  "pkgDetailTitle": "Review Package",
+  "pkgDetailNotLoaded": "Package #{orderId} could not be loaded",
+  "@pkgDetailNotLoaded": {
+    "placeholders": {
+      "orderId": {
+        "type": "int"
+      }
+    }
+  },
+  "pkgDetailNotLoadedMessage": "Open it again from your Packages list to see its details.",
+  "pkgGoToPackages": "Go to Packages",
+  "pkgCancelConfirmMessage": "Want to cancel this package?",
+  "pkgCancelledToast": "Package cancelled successfully",
+  "pkgDropConfirmTitle": "Are you sure you want to drop this package?",
+  "pkgDropConfirmMessage": "Oops. We understand, life happens! If you change your mind, feel free to recarry anytime.",
+  "pkgUnassignedToast": "Package unassigned successfully",
+  "pkgDroppedToast": "Package dropped successfully",
+  "pkgExtendDate": "Extend Date",
+  "pkgExtendConfirmMessage": "Your package's expiry date will be extended to {date}",
+  "@pkgExtendConfirmMessage": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pkgExtendedToast": "Package date extended successfully",
+  "pkgCarryPackage": "Carry package",
+  "pkgCancelPackage": "Cancel Package",
+  "pkgUnassignPackage": "Unassign Package",
+  "pkgDropPackage": "Drop Package",
+  "pkgPickupPackage": "Pickup Package",
+  "pkgMarkTransit": "Transit",
+  "pkgMarkDelivered": "Package Delivered",
+  "pkgChangeStatus": "Change Status",
+  "pkgSenderDetails": "Sender Details",
+  "pkgReceiverDetails": "Receiver Details",
+  "pkgStepWhereWho": "Where & who",
+  "pkgStepWhatHow": "What & how",
+  "pkgSender": "Sender",
+  "pkgReceiver": "Receiver",
+  "pkgSenderAddress": "Sender Address",
+  "pkgReceiverAddress": "Receiver Address",
+  "pkgCountriesLoading": "Countries are still loading.",
+  "pkgTermsOpenFailed": "Could not open the Terms & Conditions.",
+  "pkgPickupAddressRequired": "Pickup address is required.",
+  "pkgDeliveryAddressRequired": "Delivery address is required.",
+  "pkgSenderNameRequired": "Sender name is required.",
+  "pkgReceiverNameRequired": "Receiver name is required.",
+  "pkgSenderPhoneRequired": "Sender phone is required.",
+  "pkgReceiverPhoneRequired": "Receiver phone is required.",
+  "pkgPackageTypeRequired": "Package type is required.",
+  "pkgPackageValueRequired": "Package value is required.",
+  "pkgWeightRequired": "Package weight is required.",
+  "pkgRewardRequired": "Carrier reward is required.",
+  "pkgNeededBeforeRequired": "Please select the date the package is needed before.",
+  "pkgLoginRequired": "Please login to access this page.",
+  "pkgSenderContactSubtitle": "Who hands the package to the carrier",
+  "pkgReceiverContactSubtitle": "Who receives the package",
+  "pkgSenderName": "Sender Name",
+  "pkgReceiverName": "Receiver Name",
+  "pkgSenderPhone": "Sender Phone",
+  "pkgReceiverPhone": "Receiver Phone",
+  "pkgSenderSelfSubtitle": "The carrier picks the package up from you",
+  "pkgReceiverSelfSubtitle": "The package is delivered to you",
+  "pkgTermsAcceptance": "By confirming I accept this package doesn't contain illegal or restricted items; if illegal or restricted items are found, they may be reported to the law enforcement authorities.",
+  "pkgTermsAndConditions": "Terms & Conditions",
+  "pkgReceivePackageTitle": "Receive Package",
+  "pkgSendPackageTitle": "Send Package",
+  "pkgUpdatePackage": "Update Package",
+  "pkgCreatePackage": "Create Package",
+  "accCouldNotOpenLink": "Could not open the link.",
+  "accLogoutConfirmMessage": "Want to logout from your account?",
+  "accLogoutConfirmLabel": "Yes, logout",
+  "accDeleteConfirmMessage": "Want to delete your account? All your data and order history will be removed and you will not be able to undo this.",
+  "accDeleteConfirmLabel": "Yes, delete",
+  "accAccountDeleted": "Account deleted successfully.",
+  "accRating": "Rating",
+  "accTrees": "Trees",
+  "accSettings": "Settings",
+  "accAccountDetails": "Account Details",
+  "accMyAddresses": "My Addresses",
+  "accCarbonCalculator": "Carbon Calculator",
+  "accTermsAndConditions": "Terms & Conditions",
+  "accDeleteMyAccount": "Delete My Account",
+  "accVersion": "v {version}",
+  "@accVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String",
+        "example": "1.2.3"
+      }
+    }
+  },
+  "accUpdateAccountInfo": "Update Account Information",
+  "accVerifiedFieldsNote": "Your name and phone are verified with your identity and cannot be changed here.",
+  "accName": "Name",
+  "accPhone": "Phone",
+  "accEmail": "Email",
+  "accCountry": "Country",
+  "accCity": "City",
+  "accChangePassword": "Change Password",
+  "accLeaveEmptyPassword": "Leave empty to keep your current password.",
+  "accNewPassword": "New password",
+  "accUpdate": "Update",
+  "accAccountUpdated": "Account updated successfully",
+  "accUnknownCity": "Unknown City",
+  "accPickLocationFirst": "Pick a location on the map first.",
+  "accAddressUpdated": "Address updated",
+  "accAddressAdded": "Address added",
+  "accAddressDetails": "Address details",
+  "accAddressName": "Address Name",
+  "accAddressNameHint": "Home, Office…",
+  "accStreet": "Street",
+  "accBuilding": "Building",
+  "accApartment": "Apartment",
+  "accNotes": "Notes",
+  "accNotesHint": "Landmark, floor, gate code…",
+  "accEditAddress": "Edit Address",
+  "accAddress": "Address",
+  "accBackToForm": "Back to form",
+  "accDeleteAddressTitle": "Delete address?",
+  "accDeleteAddressMessage": "Are you sure you want to delete this address?",
+  "accAddressDeleted": "Address deleted",
+  "accAddNewAddress": "Add New",
+  "accNoAddressesTitle": "No addresses yet",
+  "accNoAddressesMessage": "You don't have any saved delivery address.",
+  "accFromAirport": "From Airport",
+  "accToAirport": "To Airport",
+  "accWeightKg": "Weight (kg)",
+  "accCustomWeightKg": "Custom Weight (kg)",
+  "accOtherWeight": "Other",
+  "accKgValue": "{value} kg",
+  "@accKgValue": {
+    "placeholders": {
+      "value": {
+        "type": "String",
+        "example": "2.5"
+      }
+    }
+  },
+  "accCalculateCo2": "Calculate CO₂",
+  "accReset": "Reset",
+  "accCo2Calculator": "CO₂ Calculator",
+  "accCalculatorIntro": "See what a package carried on a trip already being made saves against traditional cargo.",
+  "accInvalidCalculatorInput": "Please select valid airports and weight.",
+  "accDistance": "Distance",
+  "accTraditionalCo2": "Traditional CO₂",
+  "accCarryonCo2": "CarryOn CO₂",
+  "accCo2Saved": "CO₂ Saved",
+  "accTreesSaved": "Trees Saved",
+  "accTreesCount": "{count} trees",
+  "@accTreesCount": {
+    "placeholders": {
+      "count": {
+        "type": "String",
+        "example": "2.35"
+      }
+    }
+  },
+  "accCargoCost": "Cargo Cost",
+  "accCarryonCost": "CarryOn Cost",
+  "accYouSave": "You Save",
+  "accUsdAmount": "${amount}",
+  "@accUsdAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "12.50"
+      }
+    }
+  },
+  "accExpandMap": "Expand map",
+  "accResolvingAddress": "Resolving address…",
+  "accMovePinHint": "Move the pin to set the location",
+  "accLocateMe": "Locate me",
+  "accFindingLocation": "Finding your location…",
+  "accNotifications": "Notifications",
+  "accNotificationsEnabled": "Notifications enabled",
+  "accNotificationsDisabled": "Notifications disabled",
+  "accPermissionRequired": "Permission Required",
+  "accNotificationsPermissionMessage": "Please enable notifications in your device settings to receive updates.",
+  "accErrorTitle": "Error",
+  "accNotificationsUpdateFailed": "Failed to update notification settings. Please try again.",
+  "accSearchPlaceHint": "Search for a place",
+  "accNoResultsFound": "No results found",
+  "accClear": "Clear",
+  "tripMyTripsTitle": "My Trips",
+  "tripAddNew": "Add New Trip",
+  "tripUpdate": "Update Trip",
+  "tripCreate": "Create Trip",
+  "tripCancel": "Cancel Trip",
+  "tripEmptyTitle": "No trips yet",
+  "tripEmptyMessage": "Declare a route you travel and we will match you with packages going the same way.",
+  "tripSegmentUpcoming": "Upcoming Trips",
+  "tripSegmentPast": "Past Trips",
+  "tripNoUpcomingTitle": "No upcoming trips",
+  "tripNoUpcomingMessage": "Add a route to start carrying packages.",
+  "tripNoPastTitle": "No past trips",
+  "tripNoPastMessage": "One-time trips whose date has passed show up here.",
+  "tripTypeLabel": "Trip type",
+  "tripFrequencyOptionOneTime": "One-Time Trip",
+  "tripFrequentRoute": "Frequent Route",
+  "tripDepartFrom": "Depart From",
+  "tripArrivalTo": "Arrival To",
+  "tripDepartCountry": "Depart Country",
+  "tripDepartCity": "Depart City",
+  "tripArrivalCountry": "Arrival Country",
+  "tripArrivalCity": "Arrival City",
+  "tripSearchCountryHint": "Search country...",
+  "tripSearchCityHint": "Search city...",
+  "tripDateLabel": "Trip Date",
+  "tripSelectDate": "Select a date",
+  "tripDateHint": "Only today or a later date can be chosen.",
+  "tripCreatedToast": "Trip created",
+  "tripUpdatedToast": "Trip updated",
+  "tripCancelledToast": "Trip cancelled",
+  "tripCancelDialogTitle": "Cancel trip?",
+  "tripCancelDialogMessage": "Are you sure you want to cancel this trip?",
+  "tripGoBack": "Go back",
+  "tripPickerNoMatches": "No matches",
+  "tripPickerNoMatchesMessage": "Try a different spelling.",
+  "tripNotSaved": "The trip was not saved. Please try again.",
+  "pkwAddressNameHint": "Address Name",
+  "pkwStreetHint": "Street",
+  "pkwBuildingHint": "Building",
+  "pkwApartmentHint": "Apartment",
+  "pkwNotesHint": "Notes",
+  "pkwFieldRequired": "{field} is required.",
+  "@pkwFieldRequired": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwSaveAddressForFuture": "Save this address for future",
+  "pkwNoResultsFound": "No results found",
+  "pkwUseMyLocation": "Use my location",
+  "pkwMapUnavailable": "The map is not available here. Search for a place or use your current location.",
+  "pkwResolvingLocation": "Resolving location…",
+  "pkwLocationNotResolved": "Location not resolved yet",
+  "pkwMyLocation": "My location",
+  "pkwExpandMap": "Expand map",
+  "pkwNoLocationYet": "No location yet",
+  "pkwSavedAddresses": "Saved addresses",
+  "pkwShowFewer": "Show fewer",
+  "pkwShowAll": "Show all {count}",
+  "@pkwShowAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pkwSearchPlaceHint": "Search for a place",
+  "pkwClear": "Clear",
+  "pkwFilterFrom": "From",
+  "pkwFilterTo": "To",
+  "pkwAllCountries": "All Countries",
+  "pkwRefNumber": "Ref #{id}",
+  "@pkwRefNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwNewTag": "NEW",
+  "pkwNeededBeforeDate": "Needed Before: {date}",
+  "@pkwNeededBeforeDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwNeededSoon": "Needed Soon",
+  "pkwRewardLine": "Reward: {reward}",
+  "@pkwRewardLine": {
+    "placeholders": {
+      "reward": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwCarry": "Carry",
+  "pkwCarrierDetails": "Carrier Details",
+  "pkwCarrier": "Carrier",
+  "pkwRatingScore": "{score} / 5",
+  "@pkwRatingScore": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwRatingScoreWithCount": "{score} / 5 · {count, plural, =0{no ratings} =1{1 rating} other{{count} ratings}}",
+  "@pkwRatingScoreWithCount": {
+    "placeholders": {
+      "score": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pkwRate": "Rate",
+  "pkwPhone": "Phone",
+  "pkwContactOptions": "Contact Options",
+  "pkwCallByPhone": "Call by Phone",
+  "pkwMessageByWhatsApp": "Message by WhatsApp",
+  "pkwWhatsAppGreeting": "Hello! I am {name} from {appName}.",
+  "@pkwWhatsAppGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "appName": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwEnvironmentalImpact": "Environmental Impact",
+  "pkwDistance": "Distance",
+  "pkwCo2Saved": "CO₂ Saved",
+  "pkwTreesSaved": "Trees Saved",
+  "pkwKgAmount": "{amount} kg",
+  "@pkwKgAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwImpactMessage": "By choosing {appName}, you're reducing carbon emissions equivalent to planting {trees} trees, compared to traditional shipping!",
+  "@pkwImpactMessage": {
+    "placeholders": {
+      "appName": {
+        "type": "String"
+      },
+      "trees": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwExtendDate": "Extend Date",
+  "pkwExtendDateHint": "This package expired. Pick a new date to relist it.",
+  "pkwSearchCountryHint": "Search country...",
+  "pkwNoCountryFound": "No country found",
+  "pkwDelivery": "Delivery",
+  "pkwDeliverySubtitle": "When do you need the package?",
+  "pkwNeededBefore": "Needed Before",
+  "pkwSelectDate": "Select Date",
+  "pkwPickADate": "Pick a date",
+  "pkwNotes": "Notes",
+  "pkwNotesHintCarrier": "Any instructions for the Carrier partner?",
+  "pkwPackageOverview": "Package Overview",
+  "pkwPackageType": "Package Type",
+  "pkwWeight": "Weight",
+  "pkwValue": "Value",
+  "pkwCarrierReward": "Carrier Reward",
+  "pkwPackage": "Package",
+  "pkwPackageSubtitle": "What are you shipping?",
+  "pkwPackageTypesLoadFailed": "Package types could not be loaded.",
+  "pkwDescribePackageHint": "Describe your package",
+  "pkwPackageValue": "Package value",
+  "pkwApproximateWeight": "Approximate Weight",
+  "pkwPayment": "Payment",
+  "pkwPaymentSubtitle": "How the reward is paid",
+  "pkwCashOnDelivery": "Cash on delivery",
+  "pkwCarrierRewardSubtitle": "What the carrier earns for the trip",
+  "pkwRewardOther": "Other",
+  "pkwEnterRewardAmount": "Enter Reward Amount",
+  "pkwAddReward": "Add Reward",
+  "pkwPickupFrom": "Pickup From",
+  "pkwCarryTo": "Carry To",
+  "pkwTapToChooseAddress": "Tap to choose an address",
+  "pkwDistanceUnavailable": "Distance unavailable",
+  "pkwCo2Impact": "CO2 impact",
+  "pkwYou": "You",
+  "pkwNoPhoneOnProfile": "No phone on your profile",
+  "pkwRequestOn": "Request On",
+  "pkwFlexible": "Flexible",
+  "pkwTrackingNo": "Tracking no.",
+  "pkwDescription": "Description",
+  "pkwName": "Name",
+  "pkwAddress": "Address",
+  "pkwDetails": "Details",
+  "pkwLocation": "Location",
+  "pkwGetDirections": "Get Directions",
+  "pkwActionPickup": "Pickup Package",
+  "pkwActionTransit": "Transit",
+  "pkwActionDeliver": "Package Delivered",
+  "pkwChangeOrderStatus": "Change Order Status",
+  "pkwNothingToChange": "Nothing to change.",
+  "pkwTimelineStart": "Start",
+  "pkwTimelineStartHint": "Package posted",
+  "pkwTimelinePickupHint": "Carrier collected the package",
+  "pkwTimelineTransitHint": "On the way",
+  "pkwTimelineDeliveredHint": "Handed over",
+  "pkwPackageStatus": "Package status",
+  "pkwPackageCancelledNote": "This package was cancelled.",
+  "pkwPackageExpiredNote": "This package expired before a carrier picked it up.",
+  "pkwTrackingNumber": "Tracking #{id}",
+  "@pkwTrackingNumber": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwDeliveredOn": "Delivered on {date}",
+  "@pkwDeliveredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwCancelledOn": "Cancelled on {date}",
+  "@pkwCancelledOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwExpiredOn": "Expired on {date}",
+  "@pkwExpiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwPickedUpOn": "Picked up on {date}",
+  "@pkwPickedUpOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwTransitOn": "Transit on {date}",
+  "@pkwTransitOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwMatchedOn": "Matched on {date}",
+  "@pkwMatchedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwNeededBeforeShort": "Needed Before {date}",
+  "@pkwNeededBeforeShort": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pkwSelectRatingFirst": "Please select a rating to continue.",
+  "pkwRatingSubmitted": "Thank you! Rating submitted successfully.",
+  "pkwGiveRating": "Give Rating",
+  "pkwRatingHelps": "Your Rating Helps Us Improve",
+  "pkwSubmit": "Submit",
+  "pkwPackagesDelivered": "{count, plural, =0{No packages delivered} =1{1 package delivered} other{{count} packages delivered}}",
+  "@pkwPackagesDelivered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pkwCarrierProfileUnavailable": "Carrier profile unavailable right now."
+}
