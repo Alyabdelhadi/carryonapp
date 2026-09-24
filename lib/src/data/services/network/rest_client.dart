@@ -77,6 +77,9 @@ abstract class RestClient {
   @GET(Endpoints.appSettings)
   Future<HttpResponse<dynamic>> appSettings();
 
+  @GET(Endpoints.stats)
+  Future<HttpResponse<dynamic>> stats();
+
   @GET(Endpoints.countries)
   Future<HttpResponse<dynamic>> countries();
 
@@ -85,6 +88,36 @@ abstract class RestClient {
 
   @GET(Endpoints.paymentMethods)
   Future<HttpResponse<dynamic>> paymentMethods();
+
+  @POST(Endpoints.stripeCreatePayment)
+  Future<HttpResponse<dynamic>> stripeCreatePayment(
+    @Body() Map<String, dynamic> body,
+  );
+
+  @POST(Endpoints.stripeSyncPayment)
+  Future<HttpResponse<dynamic>> stripeSyncPayment(
+    @Body() Map<String, dynamic> body,
+  );
+
+  @GET(Endpoints.parcelOrderById)
+  Future<HttpResponse<dynamic>> parcelOrderById(@Query('id') int id);
+
+  @GET(Endpoints.wallet)
+  Future<HttpResponse<dynamic>> wallet(@Query('user_id') int userId);
+
+  @GET(Endpoints.payouts)
+  Future<HttpResponse<dynamic>> payouts(@Query('user_id') int userId);
+
+  @POST(Endpoints.payouts)
+  Future<HttpResponse<dynamic>> requestPayout(
+    @Body() Map<String, dynamic> body,
+  );
+
+  @POST(Endpoints.cancelPayout)
+  Future<HttpResponse<dynamic>> cancelPayout(
+    @Path('id') int id,
+    @Body() Map<String, dynamic> body,
+  );
 
   // ----------------------------------------------------------- addresses
   @GET(Endpoints.addresses)

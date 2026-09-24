@@ -6,4 +6,6 @@ export 'catalog.dart';
 export 'geo.dart';
 export 'parcel_order.dart';
 export 'parcel_order_draft.dart';
+export 'payment.dart';
 export 'trip.dart';
+export 'wallet.dart';

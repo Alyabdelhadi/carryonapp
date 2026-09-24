@@ -2,11 +2,13 @@ import '../../core/base/result.dart';
 import '../../core/base/unit.dart';
 import '../../domain/entities/parcel_order.dart';
 import '../../domain/entities/parcel_order_draft.dart';
+import '../../domain/entities/payment.dart';
 import '../../domain/failures/business_failure.dart';
 import '../../domain/repositories/parcel_order_repository.dart';
 import '../base/repository.dart';
 import '../failures/infra_failure.dart';
 import '../mappers/json_mappers.dart';
+import '../services/network/exceptions.dart';
 import '../services/network/rest_client.dart';
 
 final class ParcelOrderRepositoryImpl extends Repository
@@ -100,6 +102,43 @@ final class ParcelOrderRepositoryImpl extends Repository
     return asyncGuard(() async {
       await remote.markMatchingRead(carrierId, {'order_id': orderId});
       return Unit.value;
+    });
+  }
+
+  @override
+  Future<Result<ParcelOrder, BusinessFailure>> byId(int orderId) {
+    return asyncGuard(() async {
+      final response = await remote.parcelOrderById(orderId);
+      final body = response.data;
+      if (body is! Map || body['id'] == null) {
+        throw const ApiResponseException('Order not found');
+      }
+      return ParcelOrderMapper.fromJson(Json.asMap(body));
+    });
+  }
+
+  @override
+  Future<Result<StripePaymentIntent, BusinessFailure>> startStripePayment({
+    required int userId,
+    required int orderId,
+  }) {
+    return asyncGuard(() async {
+      final response = await remote.stripeCreatePayment(
+        _action(userId, orderId),
+      );
+      final map = Json.requireDone(response.data);
+      return CatalogMapper.stripePaymentIntent(map);
+    });
+  }
+
+  @override
+  Future<Result<ParcelOrder, BusinessFailure>> syncStripePayment({
+    required int userId,
+    required int orderId,
+  }) {
+    return asyncGuard(() async {
+      final response = await remote.stripeSyncPayment(_action(userId, orderId));
+      return _orderOf(response.data);
     });
   }
 

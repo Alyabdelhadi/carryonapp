@@ -11,6 +11,7 @@ import '../../features/account/view/address_form_page.dart';
 import '../../features/account/view/addresses_page.dart';
 import '../../features/account/view/carbon_calculator_page.dart';
 import '../../features/account/view/profile_page.dart';
+import '../../features/account/view/wallet_page.dart';
 import '../../features/auth/view/forgot_password_page.dart';
 import '../../features/auth/view/login_page.dart';
 import '../../features/auth/view/signup_page.dart';

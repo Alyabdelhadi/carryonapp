@@ -6,6 +6,8 @@ import '../../../../core/extensions/localization.dart';
 import '../../../../domain/entities/entities.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/text/typography.dart';
+import '../../../core/application_state/app_settings_provider/app_settings_provider.dart';
+import '../../../core/utils/formatters.dart';
 import '../riverpod/order_form_provider.dart';
 import 'order_form_section_card.dart';
 
@@ -31,12 +33,24 @@ class OrderFormPaymentSection extends ConsumerWidget {
       subtitle: context.l10n.pkwPaymentSubtitle,
       child: switch (methods) {
         AsyncData(:final value) when value.isNotEmpty => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             for (final method in value)
               _PaymentRow(
                 method: method,
                 selected: method.id == selectedId,
                 onTap: () => onSelect(method),
+              ),
+            if (value.any((m) => m.id == selectedId && !m.isCash))
+              Padding(
+                padding: EdgeInsets.only(top: context.dimensions.space.s4),
+                child: BodySmallText.muted(
+                  context.l10n.payFormHint(
+                    Formatters.percent(
+                      ref.watch(paymentRulesProvider).commissionPercent,
+                    ),
+                  ),
+                ),
               ),
           ],
         ),

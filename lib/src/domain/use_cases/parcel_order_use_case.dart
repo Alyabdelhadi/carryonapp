@@ -2,6 +2,7 @@ import '../../core/base/result.dart';
 import '../../core/base/unit.dart';
 import '../entities/parcel_order.dart';
 import '../entities/parcel_order_draft.dart';
+import '../entities/payment.dart';
 import '../failures/business_failure.dart';
 import '../repositories/parcel_order_repository.dart';
 
@@ -105,4 +106,37 @@ final class ExtendParcelOrderUseCase {
       neededBefore: neededBefore,
     );
   }
+}
+
+final class FetchParcelOrderUseCase {
+  FetchParcelOrderUseCase(this.orders);
+
+  final ParcelOrderRepository orders;
+
+  Future<Result<ParcelOrder, BusinessFailure>> call(int orderId) =>
+      orders.byId(orderId);
+}
+
+/// Step one of paying a card order: the PaymentIntent for the sheet.
+final class StartOrderPaymentUseCase {
+  StartOrderPaymentUseCase(this.orders);
+
+  final ParcelOrderRepository orders;
+
+  Future<Result<StripePaymentIntent, BusinessFailure>> call({
+    required int userId,
+    required int orderId,
+  }) => orders.startStripePayment(userId: userId, orderId: orderId);
+}
+
+/// Step two: after the sheet closed, the order with its confirmed status.
+final class SyncOrderPaymentUseCase {
+  SyncOrderPaymentUseCase(this.orders);
+
+  final ParcelOrderRepository orders;
+
+  Future<Result<ParcelOrder, BusinessFailure>> call({
+    required int userId,
+    required int orderId,
+  }) => orders.syncStripePayment(userId: userId, orderId: orderId);
 }

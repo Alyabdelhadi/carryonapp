@@ -27,6 +27,12 @@ List<GoRoute> _accountRoutes(Ref ref) {
       },
     ),
     GoRoute(
+      path: Routes.wallet.path,
+      name: Routes.wallet.name,
+      parentNavigatorKey: _rootNavigatorKey,
+      pageBuilder: (context, state) => const MaterialPage(child: WalletPage()),
+    ),
+    GoRoute(
       path: Routes.carbonCalculator.path,
       name: Routes.carbonCalculator.name,
       parentNavigatorKey: _rootNavigatorKey,

@@ -18,6 +18,7 @@ class OrderFormOverviewCard extends StatelessWidget {
     required this.reward,
     required this.neededBefore,
     required this.distanceKm,
+    this.paymentLabel,
   });
 
   final String? categoryName;
@@ -26,6 +27,9 @@ class OrderFormOverviewCard extends StatelessWidget {
   final String? reward;
   final DateTime? neededBefore;
   final double? distanceKm;
+
+  /// "Card (Stripe)" / "Cash on delivery"; shown once a reward is chosen.
+  final String? paymentLabel;
 
   /// `formatValue` of the Ionic page: the declared number with the dollar
   /// sign in front.
@@ -42,6 +46,8 @@ class OrderFormOverviewCard extends StatelessWidget {
         (l10n.pkwValue, formatValue(value!)),
       if (reward != null && reward!.isNotEmpty)
         (l10n.pkwCarrierReward, Formatters.reward(reward, free: l10n.free)),
+      if (reward != null && reward!.isNotEmpty && paymentLabel != null)
+        (l10n.pkwPayment, paymentLabel!),
       if (neededBefore != null)
         (l10n.pkwNeededBefore, Formatters.monthDayYear(neededBefore)),
       if (distanceKm != null)

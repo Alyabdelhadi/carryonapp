@@ -29,6 +29,7 @@ import '../widgets/home_loading_placeholder.dart';
 import '../widgets/offline_view.dart';
 import '../widgets/service_card.dart';
 import '../widgets/update_prompt_dialog.dart';
+import '../widgets/home_stats_row.dart';
 
 /// The home tab: greeting header, banner carousel, the three service
 /// actions and the second banner row. Goes offline with a retry view, and
@@ -115,6 +116,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     ref
       ..invalidate(homeSlidersProvider)
       ..invalidate(homeSecondarySlidersProvider)
+      ..invalidate(homeStatsProvider)
       ..invalidate(homeServicesProvider)
       ..invalidate(homePlaceProvider)
       ..invalidate(homeMatchingPackagesCountProvider)
@@ -259,6 +261,10 @@ class _HomeBody extends ConsumerWidget {
             ),
             _ => const HomeLoadingPlaceholder(showBanner: false),
           },
+          Padding(
+            padding: EdgeInsets.only(top: space.s12),
+            child: const HomeStatsRow(),
+          ),
           switch (secondary) {
             AsyncData(:final value) when value.isNotEmpty => Padding(
               padding: EdgeInsets.only(top: space.s12),

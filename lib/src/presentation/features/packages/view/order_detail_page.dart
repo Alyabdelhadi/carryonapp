@@ -23,6 +23,7 @@ import '../widgets/order_environmental_impact_card.dart';
 import '../widgets/order_extend_date_card.dart';
 import '../widgets/order_overview_card.dart';
 import '../widgets/order_party_card.dart';
+import '../widgets/order_payment_card.dart';
 import '../widgets/order_status_action_sheet.dart';
 import '../widgets/order_status_timeline.dart';
 import '../widgets/rate_carrier_sheet.dart';
@@ -186,12 +187,46 @@ class _OrderDetailBodyState extends ConsumerState<_OrderDetailBody> {
   }
 
   Future<void> _changeStatus(int userId) async {
+    if (_order.awaitingPayment) {
+      AppFeedback.toast(context, context.l10n.payPickupBlocked);
+      return;
+    }
     final action = await showOrderStatusActionSheet(
       context,
       status: _order.status,
     );
     if (action == null || !mounted) return;
     await _transition(action, userId: userId);
+  }
+
+  /// The creator pays a card order through the Stripe sheet.
+  Future<void> _pay(int userId) async {
+    final l10n = context.l10n;
+    final outcome = await ref
+        .read(orderActionsProvider.notifier)
+        .pay(
+          userId: userId,
+          orderId: _order.id,
+          style: Theme.of(context).brightness == Brightness.dark
+              ? ThemeMode.dark
+              : ThemeMode.light,
+        );
+    if (!mounted) return;
+    switch (outcome) {
+      case PaymentCompleted(:final order):
+        setState(() => _order = order);
+        AppFeedback.toast(
+          context,
+          order.isPaid ? l10n.paySuccessToast : l10n.payProcessingToast,
+        );
+      case PaymentDismissed(:final order):
+        if (order != null) setState(() => _order = order);
+        AppFeedback.toast(context, l10n.payCancelledToast);
+      case PaymentSheetError(:final message):
+        AppFeedback.toast(context, message ?? l10n.payFailedNotice);
+      case PaymentFailed(:final failure):
+        AppFeedback.error(context, failure);
+    }
   }
 
   Future<void> _extend(int userId) async {
@@ -289,12 +324,39 @@ class _OrderDetailBodyState extends ConsumerState<_OrderDetailBody> {
           onPressed: () => _cancel(userId),
         ),
       ],
+      .assigned when isCreator && _order.canPayNow => [
+        OrderAction(
+          label: l10n.pkgUnassignShort,
+          destructive: true,
+          secondary: true,
+          onPressed: () => _drop(byCreator: true),
+        ),
+        OrderAction(
+          label: l10n.payNow,
+          icon: Icons.credit_card_rounded,
+          onPressed: () => _pay(userId),
+        ),
+      ],
       .assigned when isCreator => [
         OrderAction(
           label: l10n.pkgUnassignPackage,
           icon: Icons.person_remove_outlined,
           destructive: true,
           onPressed: () => _drop(byCreator: true),
+        ),
+      ],
+      .assigned when isCarrier && _order.awaitingPayment => [
+        OrderAction(
+          label: l10n.pkgDropPackage,
+          icon: Icons.remove_circle_outline,
+          destructive: true,
+          secondary: true,
+          onPressed: () => _drop(byCreator: false),
+        ),
+        OrderAction(
+          label: l10n.payAwaiting,
+          icon: Icons.hourglass_top_rounded,
+          onPressed: () => _changeStatus(userId),
         ),
       ],
       .assigned when isCarrier => [
@@ -373,6 +435,15 @@ class _OrderDetailBodyState extends ConsumerState<_OrderDetailBody> {
                   ],
                   gap,
                   OrderOverviewCard(order: order),
+                  if (order.isOnlinePayment || isCreator) ...[
+                    gap,
+                    OrderPaymentCard(
+                      order: order,
+                      isCreator: isCreator,
+                      isCarrier: isCarrier,
+                      onPayNow: busy ? null : () => _pay(userId),
+                    ),
+                  ],
                   if (order.carrierPhone != null) ...[
                     gap,
                     OrderCarrierCard(

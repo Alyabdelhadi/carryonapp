@@ -36,6 +36,22 @@ abstract final class Formatters {
     return '\$$a';
   }
 
+  /// "15" or "12.5": a percentage without a trailing ".0".
+  static String percent(double value) {
+    final text = value == value.roundToDouble()
+        ? value.toStringAsFixed(0)
+        : value.toStringAsFixed(1);
+    return westernDigits(text);
+  }
+
+  /// "120.00 USD" for wallet and payment amounts.
+  static String money(double? amount, String? currency) {
+    final value = westernDigits((amount ?? 0).toStringAsFixed(2));
+    // Isolated as left-to-right so "20.00 USD" keeps its order inside an
+    // Arabic sentence.
+    return '\u2066$value ${(currency ?? 'USD').toUpperCase()}\u2069';
+  }
+
   /// "4.5" or [fresh] ("New") when no ratings yet.
   static String rating(double? value, {int? count, String fresh = 'New'}) {
     if (value == null || (count ?? 1) == 0) return fresh;
@@ -47,6 +63,10 @@ abstract final class Formatters {
     if (value == null) return '0';
     return value.toStringAsFixed(fractionDigits);
   }
+
+  /// "4,560" — thousands-separated count, Western digits.
+  static String count(int value) =>
+      westernDigits(NumberFormat.decimalPattern('en_US').format(value));
 
   /// "2,138 km"; pass the localized unit as [unit].
   static String distanceKm(double? km, {String unit = 'km'}) {

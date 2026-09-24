@@ -75,6 +75,14 @@ final class CatalogRepositoryImpl extends Repository
   }
 
   @override
+  Future<Result<HomeStats, BusinessFailure>> homeStats() {
+    return asyncGuard(() async {
+      final response = await remote.stats();
+      return CatalogMapper.homeStats(Json.asMap(response.data));
+    });
+  }
+
+  @override
   Future<Result<AppSettings, BusinessFailure>> appSettings() {
     return asyncGuard(() async {
       final response = await remote.appSettings();

@@ -2,10 +2,28 @@ import '../../core/base/result.dart';
 import '../../core/base/unit.dart';
 import '../entities/parcel_order.dart';
 import '../entities/parcel_order_draft.dart';
+import '../entities/payment.dart';
 import '../failures/business_failure.dart';
 
 abstract interface class ParcelOrderRepository {
   Future<Result<ParcelOrder, BusinessFailure>> create(ParcelOrderDraft draft);
+
+  /// One order by id (a push notification tap lands here).
+  Future<Result<ParcelOrder, BusinessFailure>> byId(int orderId);
+
+  /// Opens (or reuses) the Stripe PaymentIntent of a card order the
+  /// creator has to pay.
+  Future<Result<StripePaymentIntent, BusinessFailure>> startStripePayment({
+    required int userId,
+    required int orderId,
+  });
+
+  /// After the payment sheet closed: the backend reads the intent from
+  /// Stripe and returns the order with its new payment status.
+  Future<Result<ParcelOrder, BusinessFailure>> syncStripePayment({
+    required int userId,
+    required int orderId,
+  });
 
   Future<Result<ParcelOrder, BusinessFailure>> update(ParcelOrderDraft draft);
 

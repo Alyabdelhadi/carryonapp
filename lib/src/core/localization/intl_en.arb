@@ -721,5 +721,157 @@
       }
     }
   },
-  "pkwCarrierProfileUnavailable": "Carrier profile unavailable right now."
+  "pkwCarrierProfileUnavailable": "Carrier profile unavailable right now.",
+  "homeStatPackages": "Packages",
+  "homeStatUsers": "Users",
+  "homeStatTreesSaved": "Trees saved",
+  "homeStatCities": "Cities",
+  "payTitle": "Payment",
+  "payMethodLabel": "Payment method",
+  "payCard": "Card (Stripe)",
+  "payStatusLabel": "Payment status",
+  "payStatusUnpaid": "Not paid yet",
+  "payStatusProcessing": "Processing",
+  "payStatusPaid": "Paid",
+  "payStatusFailed": "Payment failed",
+  "payStatusRefunded": "Refunded",
+  "payStatusRefundPending": "Refund pending",
+  "payStatusCash": "Cash on delivery",
+  "payAmountLabel": "Amount",
+  "payNow": "Pay now",
+  "payAwaiting": "Awaiting payment",
+  "payYouEarn": "You earn {amount}",
+  "@payYouEarn": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payAfterFee": "after the {percent}% service fee",
+  "@payAfterFee": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "payWaitingForSender": "Waiting for the sender to pay. Pickup opens once the payment is confirmed.",
+  "payPickupBlocked": "The sender has not paid for this package yet.",
+  "payCreatorHint": "A carrier accepted your package. Pay now to confirm the delivery; nothing is charged until you do.",
+  "payFormHint": "You pay by card only after a carrier accepts. The carrier receives the reward minus a {percent}% service fee.",
+  "@payFormHint": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "payNumericRewardRequired": "Enter the reward as a number to pay by card.",
+  "paySuccessToast": "Payment received. Your carrier can now pick up the package.",
+  "payCancelledToast": "Payment cancelled. You can pay later from the package page.",
+  "payProcessingToast": "Payment is being confirmed. Pull to refresh in a moment.",
+  "payFailedNotice": "The last payment attempt failed. Please try again.",
+  "payRefundedNotice": "Your payment was refunded to your card.",
+  "payOpeningSheet": "Opening secure payment…",
+  "pkgUnassignShort": "Unassign",
+  "payDeadlineLabel": "Pay before",
+  "walTitle": "Wallet",
+  "walBalance": "Balance",
+  "walAvailable": "Available to withdraw",
+  "walOnHold": "On hold",
+  "walHoldHint": "Earnings from card-paid packages appear here after delivery and can be withdrawn {days, plural, =0{right away} =1{after 1 day} other{after {days} days}}.",
+  "@walHoldHint": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "walMinimumHint": "Minimum payout: {amount}",
+  "@walMinimumHint": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "walRequestPayout": "Request payout",
+  "walOpenPayout": "Payout in progress",
+  "walOpenPayoutHint": "We are sending {amount} by {method}. You can cancel while it is pending.",
+  "@walOpenPayoutHint": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "walCancelPayout": "Cancel request",
+  "walCancelConfirm": "Cancel this payout request? The amount returns to your balance.",
+  "walPayoutCancelledToast": "Payout request cancelled.",
+  "walPayoutRequestedToast": "Payout requested. We will send it shortly.",
+  "walHistory": "History",
+  "walPayouts": "Payouts",
+  "walEmptyTitle": "No activity yet",
+  "walEmptyMessage": "Carry a package that is paid by card and your share lands here once it is delivered.",
+  "walTypeEarning": "Earning",
+  "walTypePayout": "Payout",
+  "walTypePayoutReversal": "Payout returned",
+  "walTypeRefund": "Refund",
+  "walTypeAdjustment": "Adjustment",
+  "walTypeUnknown": "Movement",
+  "walPackageRef": "Package #{id}",
+  "@walPackageRef": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "walHoldUntil": "On hold until {date}",
+  "@walHoldUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "walStatusPending": "Pending",
+  "walStatusPaid": "Paid",
+  "walStatusRejected": "Rejected",
+  "walStatusCancelled": "Cancelled",
+  "walStatusUnknown": "Unknown",
+  "walReference": "Reference: {reference}",
+  "@walReference": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "walSheetTitle": "Request a payout",
+  "walAmount": "Amount ({currency})",
+  "@walAmount": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "walAmountAll": "Withdraw all",
+  "walMethod": "How should we send it?",
+  "walFieldAccountName": "Account holder name",
+  "walFieldIban": "IBAN / account number",
+  "walFieldBankName": "Bank name",
+  "walFieldFullName": "Full name",
+  "walFieldPhone": "Phone number",
+  "walFieldEmail": "Email",
+  "walFieldDetails": "Details",
+  "walSubmit": "Send request",
+  "walAmountInvalid": "Enter a valid amount.",
+  "walDetailsRequired": "Please fill in where to send the money.",
+  "walMethodRequired": "Please choose a payout method."
 }

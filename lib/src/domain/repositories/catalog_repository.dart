@@ -20,6 +20,8 @@ abstract interface class CatalogRepository {
 
   Future<Result<AppSettings, BusinessFailure>> appSettings();
 
+  Future<Result<HomeStats, BusinessFailure>> homeStats();
+
   Future<Result<List<Country>, BusinessFailure>> countries();
 
   Future<Result<List<City>, BusinessFailure>> cities(int countryId);

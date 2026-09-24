@@ -187,9 +187,67 @@ class AppVersionInfo {
 
 /// Admin-managed runtime switches (`/appSettings`).
 class AppSettings {
-  const AppSettings({this.shuftiEnabled = true});
+  const AppSettings({
+    this.shuftiEnabled = true,
+    this.payments = const PaymentRules(),
+  });
 
   /// When false, signup skips the Shufti identity check and only uploads
   /// the photos for manual review.
   final bool shuftiEnabled;
+
+  final PaymentRules payments;
+}
+
+/// One way a carrier can be paid out (admin-edited list).
+class PayoutMethod {
+  const PayoutMethod({required this.code, required this.name});
+
+  final String code;
+  final String name;
+}
+
+/// The card-payment and wallet rules from the admin App Settings page
+/// (`payments` block of `/appSettings`).
+class PaymentRules {
+  const PaymentRules({
+    this.onlinePaymentEnabled = false,
+    this.currency = 'USD',
+    this.commissionPercent = 15,
+    this.payoutMinimum = 20,
+    this.payoutHoldDays = 3,
+    this.paymentDeadlineHours = 24,
+    this.payoutMethods = const [],
+  });
+
+  /// Stripe is enabled and configured on the backend.
+  final bool onlinePaymentEnabled;
+  final String currency;
+
+  /// Percentage of the reward CarryOn keeps on card orders.
+  final double commissionPercent;
+  final double payoutMinimum;
+  final int payoutHoldDays;
+  final int paymentDeadlineHours;
+  final List<PayoutMethod> payoutMethods;
+
+  /// The carrier's share of a numeric reward.
+  double carrierShare(double reward) =>
+      (reward - reward * commissionPercent / 100).clamp(0, double.infinity);
+}
+
+/// The counters on the home screen (`/stats`): computed by the backend or
+/// fixed by the admin on the App Settings page.
+class HomeStats {
+  const HomeStats({
+    required this.packages,
+    required this.users,
+    required this.treesSaved,
+    required this.cities,
+  });
+
+  final int packages;
+  final int users;
+  final int treesSaved;
+  final int cities;
 }

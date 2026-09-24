@@ -40,7 +40,8 @@ enum Routes {
   profile('/profile'),
   addresses('/addresses'),
   addressForm('/address-form'),
-  carbonCalculator('/carbon-calculator');
+  carbonCalculator('/carbon-calculator'),
+  wallet('/wallet');
 
   const Routes(this.path);
 

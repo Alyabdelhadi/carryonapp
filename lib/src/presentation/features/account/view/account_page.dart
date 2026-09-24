@@ -10,6 +10,7 @@ import '../../../../core/extensions/localization.dart';
 import '../../../../data/services/network/endpoints.dart';
 import '../../../../domain/entities/entities.dart';
 import '../../../core/application_state/localization_provider/localization_provider.dart';
+import '../../../core/application_state/app_settings_provider/app_settings_provider.dart';
 import '../../../core/application_state/logout_provider/logout_provider.dart';
 import '../../../core/application_state/session_status_provider/session_status_provider.dart';
 import '../../../core/extensions/app_texts_extension.dart';
@@ -22,7 +23,9 @@ import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/loading_indicator.dart';
 import '../../../core/widgets/login_required_view.dart';
 import '../../../core/widgets/section_card.dart';
+import '../../../core/widgets/stat_icon.dart';
 import '../riverpod/account_providers.dart';
+import '../riverpod/wallet_providers.dart';
 import '../widgets/account_header.dart';
 import '../widgets/app_version_line.dart';
 import '../widgets/menu_row.dart';
@@ -59,6 +62,7 @@ class _AccountBodyState extends ConsumerState<_AccountBody> {
   Future<void> _refresh() async {
     ref.invalidate(accountProfileProvider(widget.userId));
     ref.invalidate(accountTripsCountProvider(widget.userId));
+    ref.invalidate(walletOverviewProvider(widget.userId));
     try {
       await ref.read(accountProfileProvider(widget.userId).future);
     } on Object {
@@ -206,6 +210,12 @@ class _AccountContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final space = context.dimensions.space;
     final l10n = context.l10n;
+    // The wallet only matters once card payment is on, or when this user
+    // already has money moving through it.
+    final wallet = ref.watch(walletOverviewProvider(user.id)).value;
+    final showWallet =
+        ref.watch(paymentRulesProvider).onlinePaymentEnabled ||
+        (wallet?.hasActivity ?? false);
 
     return RefreshIndicator(
       onRefresh: onRefresh,
@@ -226,7 +236,7 @@ class _AccountContent extends ConsumerWidget {
           StatsStrip(
             tiles: [
               StatTile(
-                icon: Icons.star_rounded,
+                icon: StatIcon.star,
                 value: Formatters.rating(
                   user.averageRating,
                   count: user.ratingsCount,
@@ -235,20 +245,19 @@ class _AccountContent extends ConsumerWidget {
                 label: l10n.accRating,
               ),
               StatTile(
-                icon: Icons.inventory_2_outlined,
+                icon: StatIcon.box,
                 value: '${user.carriedPackagesCount ?? 0}',
                 label: l10n.packages,
               ),
               StatTile(
-                icon: Icons.flight_takeoff_rounded,
+                icon: StatIcon.plane,
                 value: '${tripsCount ?? 0}',
                 label: l10n.trips,
               ),
               StatTile(
-                icon: Icons.park_outlined,
+                icon: StatIcon.trees,
                 value: Formatters.compact(user.treesSaved ?? 0),
                 label: l10n.accTrees,
-                eco: true,
               ),
             ],
           ),
@@ -276,6 +285,18 @@ class _AccountContent extends ConsumerWidget {
                 label: l10n.packages,
                 onTap: () => context.goNamed(Routes.packages.name),
               ),
+              if (showWallet)
+                MenuRow(
+                  icon: Icons.account_balance_wallet_outlined,
+                  label: l10n.walTitle,
+                  value: wallet == null
+                      ? null
+                      : Formatters.money(
+                          wallet.summary.balance,
+                          wallet.summary.currency,
+                        ),
+                  onTap: () => context.pushNamed(Routes.wallet.name),
+                ),
               MenuRow(
                 icon: Icons.location_on_outlined,
                 label: l10n.accMyAddresses,

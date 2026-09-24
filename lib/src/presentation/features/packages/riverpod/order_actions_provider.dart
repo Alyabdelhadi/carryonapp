@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/base/result.dart';
@@ -6,6 +7,7 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../../domain/entities/entities.dart';
 import '../../../../domain/failures/business_failure.dart';
 import '../../../../domain/use_cases/parcel_order_use_case.dart';
+import '../../../core/services/stripe_checkout.dart';
 import 'package_lists_provider.dart';
 
 export '../../../../domain/use_cases/parcel_order_use_case.dart'
@@ -30,6 +32,56 @@ class OrderActions extends AsyncNotifier<ParcelOrder?> {
           .read(transitionParcelOrderUseCaseProvider)
           .call(action: action, userId: userId, orderId: orderId),
     );
+  }
+
+  /// The creator pays a card order: PaymentIntent from the backend, the
+  /// Stripe sheet, then the backend re-reads the intent so the returned
+  /// order already says "paid".
+  Future<PayOutcome> pay({
+    required int userId,
+    required int orderId,
+    ThemeMode style = ThemeMode.light,
+  }) async {
+    state = const AsyncValue.loading();
+    final started = await ref
+        .read(startOrderPaymentUseCaseProvider)
+        .call(userId: userId, orderId: orderId);
+    if (!ref.mounted) return const PaymentDismissed(null);
+    final StripePaymentIntent intent;
+    switch (started) {
+      case Success(:final data):
+        intent = data;
+      case Error(:final error):
+        state = AsyncValue.error(error, StackTrace.current);
+        return PaymentFailed(error);
+    }
+
+    final outcome = await ref
+        .read(stripeCheckoutProvider)
+        .pay(intent, style: style);
+    if (!ref.mounted) return const PaymentDismissed(null);
+    if (outcome is StripeCheckoutFailed) {
+      state = const AsyncValue.data(null);
+      return PaymentSheetError(outcome.message);
+    }
+
+    // Both on success and on dismissal: let the backend read the intent so
+    // the order reflects what Stripe actually did.
+    final synced = await ref
+        .read(syncOrderPaymentUseCaseProvider)
+        .call(userId: userId, orderId: orderId);
+    if (!ref.mounted) return const PaymentDismissed(null);
+    switch (synced) {
+      case Success(:final data):
+        state = AsyncValue.data(data);
+        invalidatePackageLists(ref);
+        return outcome is StripeCheckoutCancelled
+            ? PaymentDismissed(data)
+            : PaymentCompleted(data);
+      case Error(:final error):
+        state = AsyncValue.error(error, StackTrace.current);
+        return PaymentFailed(error);
+    }
   }
 
   /// Moves the "needed before" date of an expired order.
@@ -136,3 +188,38 @@ class RatedOrderIds extends Notifier<Set<int>> {
 final ratedOrderIdsProvider = NotifierProvider<RatedOrderIds, Set<int>>(
   RatedOrderIds.new,
 );
+
+/// How [OrderActions.pay] ended.
+sealed class PayOutcome {
+  const PayOutcome();
+}
+
+/// Stripe confirmed the charge and the backend marked the order paid (or
+/// is about to, when [order] still says processing).
+final class PaymentCompleted extends PayOutcome {
+  const PaymentCompleted(this.order);
+
+  final ParcelOrder order;
+}
+
+/// The sender closed the sheet without paying; [order] is the refreshed
+/// order when the backend was reached.
+final class PaymentDismissed extends PayOutcome {
+  const PaymentDismissed(this.order);
+
+  final ParcelOrder? order;
+}
+
+/// Stripe refused the card or the sheet could not open.
+final class PaymentSheetError extends PayOutcome {
+  const PaymentSheetError(this.message);
+
+  final String? message;
+}
+
+/// The backend refused to start or confirm the payment.
+final class PaymentFailed extends PayOutcome {
+  const PaymentFailed(this.failure);
+
+  final BusinessFailure failure;
+}

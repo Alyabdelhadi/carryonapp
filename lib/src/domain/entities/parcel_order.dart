@@ -117,6 +117,38 @@ class OrderAddress {
 /// A parcel order as returned by the list and action endpoints. The joined
 /// columns (`cate_*`, `carrier_*`, `client_*`, `is_read`) are present only
 /// on the list endpoints that select them; they are null otherwise.
+/// `parcel_orders.payment_status` as the backend writes it.
+enum OrderPaymentStatus {
+  /// Card order, nothing charged yet.
+  unpaid('unpaid'),
+
+  /// A payment sheet was opened; Stripe has not confirmed yet.
+  processing('processing'),
+  paid('paid'),
+  failed('failed'),
+  refunded('refunded'),
+
+  /// Cancelled after payment but Stripe could not be reached; the admin
+  /// refunds by hand.
+  refundPending('refund_pending'),
+
+  /// Cash on delivery: never goes through the app.
+  cash('cash');
+
+  const OrderPaymentStatus(this.wire);
+
+  final String wire;
+
+  static OrderPaymentStatus fromWire(String? value, {required bool online}) {
+    final needle = (value ?? '').trim().toLowerCase();
+    for (final status in values) {
+      if (status.wire == needle) return status;
+    }
+    // Orders created before the wallet feature carry "pending" or null.
+    return online ? unpaid : cash;
+  }
+}
+
 class ParcelOrder {
   const ParcelOrder({
     required this.id,
@@ -138,6 +170,11 @@ class ParcelOrder {
     this.paymentStatus,
     this.paymentAmount,
     this.paymentCurrency,
+    this.commissionAmount,
+    this.carrierEarning,
+    this.paymentDeadlineAt,
+    this.paidAt,
+    this.refundedAt,
     this.notes,
     this.value,
     this.weight,
@@ -184,10 +221,24 @@ class ParcelOrder {
 
   /// 1 = send flow, 2 = receive flow (as recorded by the order form).
   final int? type;
+
+  /// `cash_on_delivery` or `stripe` (older orders carry the numeric id).
   final String? paymentMethod;
   final String? paymentStatus;
+
+  /// What the sender is charged on a card order (the numeric reward).
   final double? paymentAmount;
   final String? paymentCurrency;
+
+  /// CarryOn's cut and the carrier's share of a card order.
+  final double? commissionAmount;
+  final double? carrierEarning;
+
+  /// Card orders: the sender must pay before this or the assignment is
+  /// released.
+  final DateTime? paymentDeadlineAt;
+  final DateTime? paidAt;
+  final DateTime? refundedAt;
   final String? notes;
 
   /// Declared item value, free text (e.g. "220").
@@ -224,6 +275,25 @@ class ParcelOrder {
 
   bool get isFreeReward =>
       amount == null || amount!.trim().toLowerCase() == 'free';
+
+  /// Paid by card through the app rather than in cash on delivery.
+  bool get isOnlinePayment => paymentMethod == 'stripe' || paymentMethod == '2';
+
+  OrderPaymentStatus get payment =>
+      OrderPaymentStatus.fromWire(paymentStatus, online: isOnlinePayment);
+
+  bool get isPaid => payment == OrderPaymentStatus.paid;
+
+  /// A card order the sender still has to pay: the carrier cannot pick it
+  /// up and the creator sees "Pay now" once a carrier accepted.
+  bool get awaitingPayment =>
+      isOnlinePayment &&
+      !isPaid &&
+      payment != OrderPaymentStatus.refunded &&
+      payment != OrderPaymentStatus.refundPending;
+
+  /// The creator can open the payment sheet.
+  bool get canPayNow => awaitingPayment && status == ParcelOrderStatus.assigned;
 
   bool get hasNeededBeforeDate => orderDate != null;
 

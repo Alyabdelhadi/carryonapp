@@ -42,9 +42,16 @@ class Endpoints {
   static const String texts = '/getTexts';
   static const String appVersions = '/appVersions';
   static const String appSettings = '/appSettings';
+  static const String stats = '/stats';
   static const String countries = '/countries';
   static const String citiesByCountry = '/countries/{id}/cities';
   static const String paymentMethods = '/payment-methods';
+  static const String stripeCreatePayment = '/payments/stripe/create';
+  static const String stripeSyncPayment = '/payments/stripe/sync';
+  static const String parcelOrderById = '/parcelOrder';
+  static const String wallet = '/wallet';
+  static const String payouts = '/payouts';
+  static const String cancelPayout = '/payouts/{id}/cancel';
 
   // Addresses
   static const String addresses = '/getAddresses';

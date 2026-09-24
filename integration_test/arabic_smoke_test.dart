@@ -69,6 +69,8 @@ void main() {
       await _pumpUntil(tester, _navLabel(ar.account), timeout: 40);
     }
 
+    // Back to the top of the account page so the stats strip is visible.
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, 1200));
     await _settle(tester, 2);
     await binding.takeScreenshot('ar_01_account');
 

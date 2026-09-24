@@ -291,6 +291,24 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
 
   // ----------------------------------------------------------- derived
 
+  /// The chosen payment method is Stripe (card), not cash.
+  bool get _paysByCard {
+    final methods = ref.read(orderFormPaymentMethodsProvider).value;
+    if (methods == null) return false;
+    for (final m in methods) {
+      if (m.id == _paymentMethodId) return !m.isCash;
+    }
+    return false;
+  }
+
+  /// The reward as a number, or null for "Free" / text rewards.
+  double? get _numericReward {
+    final match = RegExp(r'\d+(?:[.,]\d+)?').firstMatch(_reward);
+    if (match == null) return null;
+    final value = double.tryParse(match.group(0)!.replaceAll(',', '.'));
+    return value == null || value <= 0 ? null : value;
+  }
+
   double? get _distanceKm {
     final s = _sender;
     final r = _receiver;
@@ -472,6 +490,9 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
     if (_reward.isEmpty || _reward == OrderFormRewardSection.other) {
       return l10n.pkgRewardRequired;
     }
+    if (_paysByCard && _numericReward == null) {
+      return l10n.payNumericRewardRequired;
+    }
     if (!_neededSoon && _neededBefore == null) {
       return l10n.pkgNeededBeforeRequired;
     }
@@ -640,7 +661,11 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
             onPickDate: _pickDate,
           ),
           OrderFormRewardSection(
-            options: _rewardOptions,
+            options: _paysByCard
+                ? _rewardOptions
+                      .where((o) => o != OrderFormRewardSection.free)
+                      .toList()
+                : _rewardOptions,
             rewardChip: _rewardChip,
             onRewardChip: _onRewardChip,
             customRewardController: _customRewardController,
@@ -650,7 +675,15 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
             selectedId: _paymentMethodId,
             onSelect: (method) {
               _paymentResolved = true;
-              setState(() => _paymentMethodId = method.id);
+              setState(() {
+                _paymentMethodId = method.id;
+                // "Free" cannot be charged to a card.
+                if (!method.isCash &&
+                    _rewardChip == OrderFormRewardSection.free) {
+                  _rewardChip = null;
+                  _reward = '';
+                }
+              });
             },
           ),
           OrderFormNotesSection(
@@ -666,6 +699,7 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
             reward: _reward == OrderFormRewardSection.other ? null : _reward,
             neededBefore: _neededSoon ? null : _neededBefore,
             distanceKm: _distanceKm,
+            paymentLabel: _paysByCard ? l10n.payCard : l10n.payStatusCash,
           ),
         ],
       );

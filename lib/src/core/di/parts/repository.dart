@@ -32,6 +32,14 @@ ParcelOrderRepository parcelOrderRepository(Ref ref) {
 }
 
 @Riverpod(keepAlive: true)
+WalletRepository walletRepository(Ref ref) {
+  return WalletRepositoryImpl(
+    remote: ref.watch(restClientServiceProvider),
+    crashReporter: ref.watch(crashReporterProvider),
+  );
+}
+
+@Riverpod(keepAlive: true)
 TripRepository tripRepository(Ref ref) {
   return TripRepositoryImpl(
     remote: ref.watch(restClientServiceProvider),

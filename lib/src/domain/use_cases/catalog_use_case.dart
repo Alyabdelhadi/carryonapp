@@ -53,6 +53,14 @@ final class GetAppTextsUseCase {
   }
 }
 
+final class GetHomeStatsUseCase {
+  GetHomeStatsUseCase(this.catalog);
+
+  final CatalogRepository catalog;
+
+  Future<Result<HomeStats, BusinessFailure>> call() => catalog.homeStats();
+}
+
 final class GetAppVersionUseCase {
   GetAppVersionUseCase(this.catalog);
 
@@ -86,4 +94,12 @@ final class GetPaymentMethodsUseCase {
 
   Future<Result<List<PaymentMethod>, BusinessFailure>> call() =>
       catalog.paymentMethods();
+}
+
+final class GetAppSettingsUseCase {
+  GetAppSettingsUseCase(this.catalog);
+
+  final CatalogRepository catalog;
+
+  Future<Result<AppSettings, BusinessFailure>> call() => catalog.appSettings();
 }

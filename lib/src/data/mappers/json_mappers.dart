@@ -179,6 +179,11 @@ abstract final class ParcelOrderMapper {
       paymentStatus: Json.toStr(j['payment_status']),
       paymentAmount: Json.toDouble(j['payment_amount']),
       paymentCurrency: Json.toStr(j['payment_currency']),
+      commissionAmount: Json.toDouble(j['commission_amount']),
+      carrierEarning: Json.toDouble(j['carrier_earning']),
+      paymentDeadlineAt: Json.toDate(j['payment_deadline_at']),
+      paidAt: Json.toDate(j['paid_at']),
+      refundedAt: Json.toDate(j['refunded_at']),
       notes: Json.toStr(j['notes']),
       value: Json.toStr(j['value']),
       weight: Json.toStr(j['weight']),
@@ -361,6 +366,49 @@ abstract final class CatalogMapper {
     shuftiEnabled: j.containsKey('shufti_enabled')
         ? Json.toBool(j['shufti_enabled'])
         : true,
+    payments: j['payments'] is Map
+        ? paymentRules(Json.asMap(j['payments']))
+        : const PaymentRules(),
+  );
+
+  static PaymentRules paymentRules(Map<String, dynamic> j) {
+    const defaults = PaymentRules();
+    return PaymentRules(
+      onlinePaymentEnabled: Json.toBool(j['online_payment_enabled']),
+      currency: Json.str(j['currency'], defaults.currency).toUpperCase(),
+      commissionPercent:
+          Json.toDouble(j['commission_percent']) ?? defaults.commissionPercent,
+      payoutMinimum:
+          Json.toDouble(j['payout_minimum']) ?? defaults.payoutMinimum,
+      payoutHoldDays:
+          Json.toInt(j['payout_hold_days']) ?? defaults.payoutHoldDays,
+      paymentDeadlineHours:
+          Json.toInt(j['payment_deadline_hours']) ??
+          defaults.paymentDeadlineHours,
+      payoutMethods: [
+        for (final m in Json.asList(j['payout_methods']))
+          PayoutMethod(
+            code: Json.str(m['code']),
+            name: Json.str(m['name'], Json.str(m['code'])),
+          ),
+      ],
+    );
+  }
+
+  static StripePaymentIntent stripePaymentIntent(Map<String, dynamic> j) =>
+      StripePaymentIntent(
+        clientSecret: Json.str(j['client_secret']),
+        paymentIntentId: Json.str(j['payment_intent_id']),
+        publishableKey: Json.str(j['publishable_key']),
+        amount: Json.toDouble(j['payment_amount']) ?? 0,
+        currency: Json.str(j['payment_currency'], 'USD').toUpperCase(),
+      );
+
+  static HomeStats homeStats(Map<String, dynamic> j) => HomeStats(
+    packages: Json.toInt(j['packages']) ?? 0,
+    users: Json.toInt(j['users']) ?? 0,
+    treesSaved: Json.toInt(j['trees_saved']) ?? 0,
+    cities: Json.toInt(j['cities']) ?? 0,
   );
 
   static AppVersionInfo appVersion(Map<String, dynamic> j) => AppVersionInfo(
@@ -376,4 +424,59 @@ abstract final class CatalogMapper {
     });
     return AppTexts(out);
   }
+}
+
+abstract final class WalletMapper {
+  static WalletSummary summary(Map<String, dynamic> j) => WalletSummary(
+    balance: Json.toDouble(j['balance']) ?? 0,
+    available: Json.toDouble(j['available']) ?? 0,
+    pending: Json.toDouble(j['pending']) ?? 0,
+    currency: Json.str(j['currency'], 'USD').toUpperCase(),
+  );
+
+  static WalletTransaction transaction(Map<String, dynamic> j) =>
+      WalletTransaction(
+        id: Json.toInt(j['id']) ?? 0,
+        type: WalletTransactionType.fromWire(Json.toStr(j['type'])),
+        amount: Json.toDouble(j['amount']) ?? 0,
+        currency: Json.str(j['currency'], 'USD').toUpperCase(),
+        balanceAfter: Json.toDouble(j['balance_after']) ?? 0,
+        orderId: Json.toInt(j['parcel_order_id']),
+        payoutRequestId: Json.toInt(j['payout_request_id']),
+        availableAt: Json.toDate(j['available_at']),
+        note: Json.toStr(j['note']),
+        createdAt: Json.toDate(j['created_at']),
+      );
+
+  static PayoutRequest payout(Map<String, dynamic> j) => PayoutRequest(
+    id: Json.toInt(j['id']) ?? 0,
+    amount: Json.toDouble(j['amount']) ?? 0,
+    currency: Json.str(j['currency'], 'USD').toUpperCase(),
+    method: Json.str(j['method']),
+    status: PayoutStatus.fromWire(Json.toStr(j['status'])),
+    details: {
+      if (j['details'] is Map)
+        for (final entry in (j['details'] as Map).entries)
+          '${entry.key}': '${entry.value}',
+    },
+    reference: Json.toStr(j['reference']),
+    adminNote: Json.toStr(j['admin_note']),
+    processedAt: Json.toDate(j['processed_at']),
+    createdAt: Json.toDate(j['created_at']),
+  );
+
+  static WalletOverview overview(Map<String, dynamic> j) => WalletOverview(
+    summary: j['wallet'] is Map
+        ? summary(Json.asMap(j['wallet']))
+        : const WalletSummary(),
+    rules: j['rules'] is Map
+        ? CatalogMapper.paymentRules(Json.asMap(j['rules']))
+        : const PaymentRules(),
+    transactions: Json.asList(j['transactions'])
+        .map((t) => transaction(Json.asMap(t)))
+        .toList(),
+    openPayout: j['open_payout'] is Map
+        ? payout(Json.asMap(j['open_payout']))
+        : null,
+  );
 }

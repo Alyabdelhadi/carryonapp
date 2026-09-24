@@ -28,6 +28,15 @@ final homeSecondarySlidersProvider =
       };
     });
 
+/// The four counters above the banner (`/stats`).
+final homeStatsProvider = FutureProvider.autoDispose<HomeStats>((ref) async {
+  final result = await ref.watch(getHomeStatsUseCaseProvider).call();
+  return switch (result) {
+    Success(:final data) => data,
+    Error(:final error) => throw error,
+  };
+});
+
 /// The send / carry / receive actions, in the admin's order.
 final homeServicesProvider = FutureProvider.autoDispose<List<AppService>>((
   ref,

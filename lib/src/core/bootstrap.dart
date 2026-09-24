@@ -27,11 +27,18 @@ Future<ProviderContainer> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   var firebaseReady = false;
-  try {
-    await Firebase.initializeApp();
-    firebaseReady = true;
-  } on Object catch (e) {
-    Log.warning('Firebase not initialised, push disabled: $e');
+  // `--dart-define=CARRYON_DISABLE_PUSH=true` keeps the iOS notification
+  // permission alert out of integration-test runs (it blanks screenshots).
+  const pushDisabled = bool.fromEnvironment('CARRYON_DISABLE_PUSH');
+  if (pushDisabled) {
+    Log.warning('Push disabled by CARRYON_DISABLE_PUSH');
+  } else {
+    try {
+      await Firebase.initializeApp();
+      firebaseReady = true;
+    } on Object catch (e) {
+      Log.warning('Firebase not initialised, push disabled: $e');
+    }
   }
 
   final container = ProviderContainer(

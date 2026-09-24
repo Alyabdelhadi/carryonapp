@@ -67,7 +67,8 @@ navigation, theme). `docs/architecture.md`, `docs/network.md` and
 
 ## Features
 
-- Home: banners, the three actions (send / receive / carry), current city,
+- Home: stats row (packages, users, trees saved, cities from `/stats`, icons
+  in `assets/images/stats/`), banners, the three actions (send / receive / carry), current city,
   matched-package and upcoming-trip indicators, store update prompt.
 - Packages: my posted packages and packages I carry, with status timeline,
   carrier/sender contact, extend date, cancel, drop, pickup → transit →
@@ -94,6 +95,22 @@ English and Arabic. The user picks the language from Account → Language (or th
 - Server data with an Arabic form: service tile names, country and city names (pickers, trips, package routes, saved addresses) and the home banners (`img_ar`). Entities expose `nameFor(languageCode)` / `cityFor` / `countryFor` / `imageFor`; use `context.languageCode`. Anything without an Arabic value falls back to English.
 - Dates follow the locale for month and weekday names; digits are always Western (0-9).
 - Layout uses directional paddings/alignments so it mirrors correctly; fields that hold phone numbers, emails, passwords and amounts stay left-to-right.
+
+## Card payment (Stripe)
+
+`flutter_stripe` drives the payment sheet; the publishable key arrives with every
+PaymentIntent from `POST /payments/stripe/create`, so nothing is compiled in. The
+creator pays from the order page once a carrier accepted ("Pay now"); the carrier's
+pickup button stays blocked until the order is paid. Android hosts the sheet in
+`FlutterFragmentActivity` with a MaterialComponents theme (do not switch back to
+`FlutterActivity`). Rules such as the commission percentage come from
+`/appSettings` (`paymentRulesProvider`). `integration_test/payment_smoke_test.dart`
+screenshots the sender and carrier views (`CARRYON_ROLE`, `CARRYON_ORDER_ID`), and
+`integration_test/wallet_smoke_test.dart` walks the carrier wallet (request + cancel a payout,
+`CARRYON_LANG=ar` for the Arabic pass). The Wallet row on the Account tab appears once card
+payment is enabled or the user has wallet activity. Pass
+`--dart-define=CARRYON_DISABLE_PUSH=true` to any integration run, otherwise the iOS
+notification permission alert blanks every screenshot.
 
 ## Admin switches
 

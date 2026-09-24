@@ -11,14 +11,23 @@ import '../../../core/widgets/section_card.dart';
 import '../../../core/widgets/status_badge.dart';
 import '../../../core/widgets/text/typography.dart';
 import '../../../core/extensions/place_names_extension.dart';
+import 'payment_status_badge.dart';
 
 /// One row of the Packages tab: category icon (or a status glyph once the
 /// order is moving), tracking number, route, status line and reward.
 class PackageListTile extends StatelessWidget {
-  const PackageListTile({super.key, required this.order, required this.onTap});
+  const PackageListTile({
+    super.key,
+    required this.order,
+    required this.onTap,
+    this.viewerId,
+  });
 
   final ParcelOrder order;
   final VoidCallback onTap;
+
+  /// The signed-in user, so the creator's own unpaid orders show "Pay now".
+  final int? viewerId;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +57,17 @@ class PackageListTile extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (order.isOnlinePayment) ...[
+                  Gap(context.dimensions.space.s4),
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: PaymentStatusBadge(
+                      order: order,
+                      viewerIsCreator:
+                          viewerId != null && order.isCreatedBy(viewerId),
+                    ),
+                  ),
+                ],
                 Gap(context.dimensions.space.s4),
                 PackageRouteLine(
                   from:

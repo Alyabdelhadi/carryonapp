@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../domain/entities/entities.dart';
+import '../../../core/application_state/session_status_provider/session_status_provider.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/empty_state.dart';
@@ -65,6 +66,7 @@ class PackageListSegment extends ConsumerWidget {
             final order = value[index];
             return PackageListTile(
               order: order,
+              viewerId: ref.watch(currentUserIdProvider),
               onTap: () => context.pushNamed(
                 Routes.orderDetail.name,
                 pathParameters: {'id': '${order.id}'},

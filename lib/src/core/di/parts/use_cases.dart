@@ -90,6 +90,11 @@ GetAppTextsUseCase getAppTextsUseCase(Ref ref) {
 }
 
 @riverpod
+GetHomeStatsUseCase getHomeStatsUseCase(Ref ref) {
+  return GetHomeStatsUseCase(ref.watch(catalogRepositoryProvider));
+}
+
+@riverpod
 GetAppVersionUseCase getAppVersionUseCase(Ref ref) {
   return GetAppVersionUseCase(ref.watch(catalogRepositoryProvider));
 }
@@ -152,6 +157,48 @@ TransitionParcelOrderUseCase transitionParcelOrderUseCase(Ref ref) {
 @riverpod
 ExtendParcelOrderUseCase extendParcelOrderUseCase(Ref ref) {
   return ExtendParcelOrderUseCase(ref.watch(parcelOrderRepositoryProvider));
+}
+
+@riverpod
+GetAppSettingsUseCase getAppSettingsUseCase(Ref ref) {
+  return GetAppSettingsUseCase(ref.watch(catalogRepositoryProvider));
+}
+
+@riverpod
+FetchParcelOrderUseCase fetchParcelOrderUseCase(Ref ref) {
+  return FetchParcelOrderUseCase(ref.watch(parcelOrderRepositoryProvider));
+}
+
+@riverpod
+StartOrderPaymentUseCase startOrderPaymentUseCase(Ref ref) {
+  return StartOrderPaymentUseCase(ref.watch(parcelOrderRepositoryProvider));
+}
+
+@riverpod
+SyncOrderPaymentUseCase syncOrderPaymentUseCase(Ref ref) {
+  return SyncOrderPaymentUseCase(ref.watch(parcelOrderRepositoryProvider));
+}
+
+// ---------------------------------------------------------------- wallet
+
+@riverpod
+GetWalletOverviewUseCase getWalletOverviewUseCase(Ref ref) {
+  return GetWalletOverviewUseCase(ref.watch(walletRepositoryProvider));
+}
+
+@riverpod
+GetPayoutsUseCase getPayoutsUseCase(Ref ref) {
+  return GetPayoutsUseCase(ref.watch(walletRepositoryProvider));
+}
+
+@riverpod
+RequestPayoutUseCase requestPayoutUseCase(Ref ref) {
+  return RequestPayoutUseCase(ref.watch(walletRepositoryProvider));
+}
+
+@riverpod
+CancelPayoutUseCase cancelPayoutUseCase(Ref ref) {
+  return CancelPayoutUseCase(ref.watch(walletRepositoryProvider));
 }
 
 // ----------------------------------------------------------------- trips
