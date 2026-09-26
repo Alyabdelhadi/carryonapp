@@ -77,6 +77,30 @@ abstract final class Json {
     final msg = toStr(map['msg']) ?? toStr(map['message']);
     if (msg != null && msg.toLowerCase() == 'done') return map;
     final error = toStr(map['error']) ?? msg ?? 'Request failed';
+    final identityKind = switch (toStr(map['reason'])) {
+      'identity_declined' => IdentityVerificationFailureKind.declined,
+      'identity_invalid' => IdentityVerificationFailureKind.invalid,
+      'identity_unavailable' => IdentityVerificationFailureKind.unreachable,
+      'identity_live_required' => IdentityVerificationFailureKind.liveRequired,
+      _ => null,
+    };
+    final resetKind = switch (toStr(map['reason'])) {
+      'otp_invalid' => PasswordResetFailureKind.invalidCode,
+      'otp_expired' => PasswordResetFailureKind.expiredCode,
+      'otp_locked' => PasswordResetFailureKind.tooManyAttempts,
+      'token_expired' => PasswordResetFailureKind.sessionExpired,
+      _ => null,
+    };
+    if (resetKind != null) {
+      throw PasswordResetRejectedException(error, kind: resetKind);
+    }
+    if (identityKind != null) {
+      throw IdentityRejectedException(
+        error,
+        kind: identityKind,
+        detail: toStr(map['detail']),
+      );
+    }
     throw ApiResponseException(error);
   }
 }
@@ -101,6 +125,10 @@ abstract final class AppUserMapper {
       packagesCount: Json.toInt(j['packages_count']),
       averageRating: Json.toDouble(j['average_rating']),
       ratingsCount: Json.toInt(j['ratings_count']),
+      identityStatus: IdentityStatus.fromWire(
+        j['identity_status'],
+        isVerified: j['is_verified'],
+      ),
     );
   }
 
@@ -123,6 +151,7 @@ abstract final class AppUserMapper {
     'packages_count': u.packagesCount,
     'average_rating': u.averageRating,
     'ratings_count': u.ratingsCount,
+    'identity_status': u.identityStatus.name,
   };
 }
 
@@ -366,6 +395,7 @@ abstract final class CatalogMapper {
     shuftiEnabled: j.containsKey('shufti_enabled')
         ? Json.toBool(j['shufti_enabled'])
         : true,
+    shuftiLive: Json.toBool(j['shufti_live']),
     payments: j['payments'] is Map
         ? paymentRules(Json.asMap(j['payments']))
         : const PaymentRules(),

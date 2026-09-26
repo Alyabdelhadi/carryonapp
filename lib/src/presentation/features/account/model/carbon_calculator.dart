@@ -61,9 +61,6 @@ abstract final class CarbonCalculator {
   static const double cargoRatePerKgPerKm = 0.03;
   static const double carryonRatePerKgPerKm = 0.01;
 
-  /// Preset weights (kg) offered before "Other".
-  static const List<double> presetWeightsKg = [0.5, 1, 2, 3, 5, 7, 10, 15, 23];
-
   /// The airport list as the original shipped it, minus its duplicate
   /// rows (DEL, LGW, DUB and MUC appeared twice; the first entry always
   /// won the lookup, so dropping the repeats changes nothing).

@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/di/dependency_injection.dart';
 import '../../../../domain/entities/app_user.dart';
+import '../app_gate_provider/app_gate_provider.dart';
 
 part 'session_status_provider.g.dart';
 
@@ -30,6 +31,8 @@ int? currentUserId(Ref ref) {
 @Riverpod(keepAlive: true)
 AppUser? currentUser(Ref ref) {
   ref.watch(sessionStatusProvider);
+  // the gate re-fetches the user from the server; pick that copy up
+  ref.watch(identityGateProvider);
   return ref.read(getSessionUseCaseProvider).user;
 }
 

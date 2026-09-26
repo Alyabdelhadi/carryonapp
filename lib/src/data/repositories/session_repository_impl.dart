@@ -72,30 +72,4 @@ final class SessionRepositoryImpl implements SessionRepository {
   Future<void> cacheTexts(AppTexts texts) {
     return local.save(CacheKey.appTexts, jsonEncode(texts.toMap()));
   }
-
-  @override
-  DateTime? get lastUpdateCheck => _millis(CacheKey.lastUpdateCheck);
-
-  @override
-  Future<void> setLastUpdateCheck(DateTime at) {
-    return local.save(CacheKey.lastUpdateCheck, at.millisecondsSinceEpoch);
-  }
-
-  @override
-  DateTime? get updatePostponedUntil => _millis(CacheKey.updatePostponedUntil);
-
-  @override
-  Future<void> setUpdatePostponedUntil(DateTime? until) {
-    if (until == null) return local.remove([CacheKey.updatePostponedUntil]);
-    return local.save(
-      CacheKey.updatePostponedUntil,
-      until.millisecondsSinceEpoch,
-    );
-  }
-
-  DateTime? _millis(CacheKey key) {
-    final value = local.get<int>(key);
-    if (value == null) return null;
-    return DateTime.fromMillisecondsSinceEpoch(value);
-  }
 }

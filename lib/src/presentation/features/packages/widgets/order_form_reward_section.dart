@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../core/extensions/localization.dart';
+import '../../../core/theme/theme.dart';
 
 import 'order_form_choice_chip.dart';
-import 'order_form_custom_input.dart';
 import 'order_form_section_card.dart';
 
 /// "Carrier Reward": Free, the preset amounts, or a custom amount.
@@ -14,14 +15,16 @@ class OrderFormRewardSection extends StatelessWidget {
     required this.rewardChip,
     required this.onRewardChip,
     required this.customRewardController,
-    required this.onAddReward,
+    required this.customRewardFocus,
+    required this.onCustomReward,
   });
 
   final List<String> options;
   final String? rewardChip;
   final ValueChanged<String> onRewardChip;
   final TextEditingController customRewardController;
-  final VoidCallback onAddReward;
+  final FocusNode customRewardFocus;
+  final ValueChanged<String> onCustomReward;
 
   /// Chip values the form stores and sends; only their labels are localized.
   static const String free = 'Free';
@@ -48,15 +51,27 @@ class OrderFormRewardSection extends StatelessWidget {
             },
           ),
           if (rewardChip == other)
-            OrderFormCustomInput(
-              controller: customRewardController,
-              hint: l10n.pkwEnterRewardAmount,
-              buttonLabel: l10n.pkwAddReward,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
+            Padding(
+              padding: EdgeInsets.only(top: context.dimensions.space.s12),
+              child: TextField(
+                controller: customRewardController,
+                focusNode: customRewardFocus,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'^\d*[.,]?\d{0,2}'),
+                  ),
+                ],
+                textInputAction: TextInputAction.done,
+                textDirection: TextDirection.ltr,
+                onChanged: onCustomReward,
+                decoration: InputDecoration(
+                  hintText: l10n.pkwEnterRewardAmount,
+                  prefixText: '\$ ',
+                ),
               ),
-              textDirection: TextDirection.ltr,
-              onAdd: onAddReward,
             ),
         ],
       ),

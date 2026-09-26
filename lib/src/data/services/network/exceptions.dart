@@ -1,3 +1,5 @@
+import '../../../domain/entities/auth_inputs.dart';
+
 /// Sentinel raised by `AuthHeaderInterceptor` when a `RequestAuth.protected`
 /// request has no access token to send. The exception classifier maps it to
 /// `InfraFailure.unauthorized` → `BusinessFailure.unauthenticated`, so the
@@ -22,4 +24,28 @@ class ApiResponseException implements Exception {
 
   @override
   String toString() => message;
+}
+
+/// The backend refused an identity check (`"reason": "identity_*"` next
+/// to the usual error). Repositories turn it into a `BusinessFailure`
+/// whose cause is an `IdentityVerificationFailure`.
+class IdentityRejectedException extends ApiResponseException {
+  const IdentityRejectedException(
+    super.message, {
+    required this.kind,
+    this.detail,
+  });
+
+  final IdentityVerificationFailureKind kind;
+
+  /// Shufti's own explanation, when it gave one.
+  final String? detail;
+}
+
+/// The backend refused a password-reset step (`"reason": "otp_*"` or
+/// `token_expired`).
+class PasswordResetRejectedException extends ApiResponseException {
+  const PasswordResetRejectedException(super.message, {required this.kind});
+
+  final PasswordResetFailureKind kind;
 }

@@ -1,4 +1,10 @@
-enum TokenKey { access, refresh }
+enum TokenKey {
+  access,
+  refresh,
+
+  /// When the access token expires, as epoch milliseconds.
+  expiresAt,
+}
 
 /// Storage contract for auth tokens.
 ///

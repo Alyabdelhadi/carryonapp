@@ -114,8 +114,9 @@ class TripCard extends StatelessWidget {
   }
 }
 
-/// The destination image (or a tinted placeholder) with the frequency pill
-/// and an airplane badge, echoing the Ionic card's background photo.
+/// The destination image (or a tinted placeholder) with a "One-time
+/// trip" pill (recurring trips show none) and an airplane badge, echoing
+/// the Ionic card's background photo.
 class _DestinationBanner extends StatelessWidget {
   const _DestinationBanner({required this.image, required this.frequency});
 
@@ -160,18 +161,17 @@ class _DestinationBanner extends StatelessWidget {
               ),
             ),
           ),
-          PositionedDirectional(
-            top: context.dimensions.space.s12,
-            end: context.dimensions.space.s12,
-            child: TagChip(
-              label: frequency.label(context.l10n),
-              icon: frequency.isRecurring
-                  ? Icons.repeat_rounded
-                  : Icons.looks_one_outlined,
-              foreground: context.color.text.strong,
-              background: context.color.background.surface,
+          if (!frequency.isRecurring)
+            PositionedDirectional(
+              top: context.dimensions.space.s12,
+              end: context.dimensions.space.s12,
+              child: TagChip(
+                label: frequency.label(context.l10n),
+                icon: Icons.looks_one_outlined,
+                foreground: context.color.text.strong,
+                background: context.color.background.surface,
+              ),
             ),
-          ),
           PositionedDirectional(
             start: context.dimensions.space.s16,
             bottom: context.dimensions.space.s12,

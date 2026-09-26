@@ -9,7 +9,9 @@ List<GoRoute> _tripRoutes(Ref ref) {
       pageBuilder: (context, state) {
         final extra = state.extra;
         return MaterialPage(
-          child: TripFormPage(trip: extra is Trip ? extra : null),
+          child: VerifiedOnly(
+            child: TripFormPage(trip: extra is Trip ? extra : null),
+          ),
         );
       },
     ),

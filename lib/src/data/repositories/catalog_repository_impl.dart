@@ -29,6 +29,35 @@ final class CatalogRepositoryImpl extends Repository
   }
 
   @override
+  Future<Result<QuickPicks, BusinessFailure>> quickPicks() {
+    return asyncGuard(() async {
+      final (weights, tips) = await (remote.weights(), remote.tips()).wait;
+      final weightRows = Json.asList(weights.data).map(Json.asMap).toList();
+      List<double> kgWhere(String flag) => [
+        for (final row in weightRows)
+          if (row[flag] == true || row[flag] == 1)
+            if (Json.toDouble(row['kg'] ?? row['value']) case final kg?)
+              if (kg > 0) kg,
+      ];
+      final rewards = [
+        for (final row in Json.asList(tips.data).map(Json.asMap))
+          if (Json.toDouble(row['amount'] ?? row['value']) case final a?)
+            if (a >= 0) a,
+      ];
+      const fallback = QuickPicks.defaults;
+      final order = kgWhere('in_order_form');
+      final calculator = kgWhere('in_calculator');
+      return QuickPicks(
+        orderWeightsKg: order.isEmpty ? fallback.orderWeightsKg : order,
+        calculatorWeightsKg: calculator.isEmpty
+            ? fallback.calculatorWeightsKg
+            : calculator,
+        rewards: rewards.isEmpty ? fallback.rewards : rewards,
+      );
+    });
+  }
+
+  @override
   Future<Result<List<ParcelCategory>, BusinessFailure>> parcelCategories() {
     return asyncGuard(() async {
       final response = await remote.parcelCategories();

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
 import 'endpoints.dart';
+import 'transport/interceptors/slow_request_interceptor.dart';
 
 part 'rest_client.g.dart';
 
@@ -25,9 +26,32 @@ abstract class RestClient {
   @POST(Endpoints.login)
   Future<HttpResponse<dynamic>> login(@Body() Map<String, dynamic> body);
 
+  /// Runs the Shufti check on the server before answering.
+  /// Ends this device's login on the server (Bearer).
+  @POST(Endpoints.authLogout)
+  Future<HttpResponse<dynamic>> logout();
+
   @POST(Endpoints.signup)
   @MultiPart()
+  @Extra({slowRequestKey: true})
   Future<HttpResponse<dynamic>> signup(@Body() FormData body);
+
+  /// Re-verification for an existing account; same slow Shufti check.
+  @POST(Endpoints.identityVerify)
+  @MultiPart()
+  @Extra({slowRequestKey: true})
+  Future<HttpResponse<dynamic>> verifyIdentity(@Body() FormData body);
+
+  /// Opens a live Shufti session; answers with its `verification_url`.
+  @POST(Endpoints.identityLive)
+  Future<HttpResponse<dynamic>> startLiveIdentity(
+    @Body() Map<String, dynamic> body,
+  );
+
+  /// The user after asking Shufti about a pending check.
+  @GET(Endpoints.identityStatus)
+  @Extra({slowRequestKey: true})
+  Future<HttpResponse<dynamic>> identityStatus(@Query('user_id') int userId);
 
   @GET(Endpoints.userInfo)
   Future<HttpResponse<dynamic>> userInfo(@Query('id') int id);
@@ -42,12 +66,17 @@ abstract class RestClient {
   @DELETE(Endpoints.deleteUser)
   Future<HttpResponse<dynamic>> deleteUser(@Query('user_id') int userId);
 
-  @POST(Endpoints.sendResetLink)
-  Future<HttpResponse<dynamic>> sendResetLink(
+  @POST(Endpoints.passwordResetRequest)
+  Future<HttpResponse<dynamic>> requestPasswordResetCode(
     @Body() Map<String, dynamic> body,
   );
 
-  @POST(Endpoints.resetPassword)
+  @POST(Endpoints.passwordResetVerify)
+  Future<HttpResponse<dynamic>> verifyPasswordResetCode(
+    @Body() Map<String, dynamic> body,
+  );
+
+  @POST(Endpoints.passwordReset)
   Future<HttpResponse<dynamic>> resetPassword(
     @Body() Map<String, dynamic> body,
   );
@@ -73,6 +102,12 @@ abstract class RestClient {
 
   @GET(Endpoints.appVersions)
   Future<HttpResponse<dynamic>> appVersions();
+
+  @GET(Endpoints.weights)
+  Future<HttpResponse<dynamic>> weights();
+
+  @GET(Endpoints.tips)
+  Future<HttpResponse<dynamic>> tips();
 
   @GET(Endpoints.appSettings)
   Future<HttpResponse<dynamic>> appSettings();
@@ -233,12 +268,6 @@ abstract class RestClient {
 
   // --------------------------------------------------------- third party
   // Absolute URLs bypass the base URL; dio sends them as-is.
-
-  @POST(Endpoints.shuftiVerify)
-  Future<HttpResponse<dynamic>> shuftiVerify(
-    @Header('Authorization') String authorization,
-    @Body() Map<String, dynamic> body,
-  );
 
   @GET(Endpoints.googlePlacesAutocomplete)
   Future<HttpResponse<dynamic>> placesAutocomplete(

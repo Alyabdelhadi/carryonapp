@@ -14,6 +14,10 @@
 enum Routes {
   splash('/splash'),
 
+  // Blocking gates: the app shows nothing else while they apply.
+  updateRequired('/update-required'),
+  verifyIdentity('/verify-identity'),
+
   // Bottom tabs (stateful shell branches).
   home('/home'),
   packages('/packages'),

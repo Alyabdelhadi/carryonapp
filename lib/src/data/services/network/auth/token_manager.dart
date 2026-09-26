@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 
 import '../../../../core/logger/log.dart';
+import '../request_auth.dart';
 import 'token_store.dart';
 
 /// In-memory cache over a [TokenStore] with single-flight refresh.
@@ -34,10 +35,40 @@ class TokenManager {
   late final Future<void> _ready;
   String? _accessToken;
   String? _refreshToken;
+  DateTime? _expiresAt;
   Completer<String>? _inflightRefresh;
+
+  /// Refresh this long before the access token expires, so a request (and
+  /// multipart uploads, which cannot be replayed after a 401) never goes
+  /// out with a token that dies on the way.
+  static const _expiryMargin = Duration(seconds: 60);
+
+  /// Called once when the server rejected the refresh token: the session
+  /// is over (logged out elsewhere, password changed, token stolen).
+  void Function()? onSessionExpired;
 
   Future<String?> get accessToken async {
     await _ready;
+    return _accessToken;
+  }
+
+  /// The access token to send now, refreshed first when it is about to
+  /// expire. Falls back to the current token when the refresh fails for a
+  /// transient reason (the server then answers 401 and the retry path runs).
+  Future<String?> validAccessToken() async {
+    await _ready;
+    final expiresAt = _expiresAt;
+    final refresh = _refreshToken;
+    if (expiresAt != null &&
+        refresh != null &&
+        refresh.isNotEmpty &&
+        DateTime.now().add(_expiryMargin).isAfter(expiresAt)) {
+      try {
+        return await this.refresh();
+      } catch (_) {
+        return _accessToken;
+      }
+    }
     return _accessToken;
   }
 
@@ -53,7 +84,11 @@ class TokenManager {
   /// *write* failure propagates by design: memory only updates after the
   /// store does, so a keystore failure surfaces as a failed login instead
   /// of a session that silently disappears on the next launch.
-  Future<void> persist({required String access, String? refresh}) async {
+  Future<void> persist({
+    required String access,
+    String? refresh,
+    Duration? expiresIn,
+  }) async {
     await _ready;
     await _store.write(.access, access);
     _accessToken = access;
@@ -61,6 +96,18 @@ class TokenManager {
       await _store.write(.refresh, refresh);
       _refreshToken = refresh;
     }
+    await _writeExpiry(expiresIn);
+  }
+
+  Future<void> _writeExpiry(Duration? expiresIn) async {
+    if (expiresIn == null) {
+      await _store.delete(.expiresAt);
+      _expiresAt = null;
+      return;
+    }
+    final at = DateTime.now().add(expiresIn);
+    await _store.write(.expiresAt, '${at.millisecondsSinceEpoch}');
+    _expiresAt = at;
   }
 
   /// Refreshes the access token. Concurrent callers share one HTTP roundtrip.
@@ -95,11 +142,13 @@ class TokenManager {
       completer.complete(newAccess);
     } catch (e, stackTrace) {
       if (_isAuthDefinitive(e)) {
+        final hadSession = _refreshToken != null;
         try {
           await clear();
         } catch (clearError, clearStack) {
           Log.error('TokenManager.clear failed: $clearError\n$clearStack');
         }
+        if (hadSession) onSessionExpired?.call();
       }
       completer.completeError(e, stackTrace);
     } finally {
@@ -129,6 +178,7 @@ class TokenManager {
     await _ready;
     _accessToken = null;
     _refreshToken = null;
+    _expiresAt = null;
     await _store.clear();
   }
 
@@ -136,6 +186,10 @@ class TokenManager {
     try {
       _accessToken = await _store.read(.access);
       _refreshToken = await _store.read(.refresh);
+      final millis = int.tryParse(await _store.read(.expiresAt) ?? '');
+      _expiresAt = millis == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(millis);
     } catch (e, stackTrace) {
       Log.error('TokenManager._load failed: $e\n$stackTrace');
     }
@@ -147,9 +201,12 @@ class TokenManager {
       throw StateError('No refresh token available');
     }
 
+    // explicitly public: the refresh call must never carry (or try to
+    // refresh) an access token itself
     final response = await _transport.post<dynamic>(
       _refreshEndpoint,
       data: {'refreshToken': refreshToken},
+      options: Options(extra: {requestAuthKey: RequestAuth.public}),
     );
 
     final data = response.data;
@@ -170,6 +227,11 @@ class TokenManager {
       await _store.write(.refresh, newRefresh);
       _refreshToken = newRefresh;
     }
+
+    final expiresIn = data['expiresIn'];
+    await _writeExpiry(
+      expiresIn is num ? Duration(seconds: expiresIn.toInt()) : null,
+    );
 
     return newAccess;
   }

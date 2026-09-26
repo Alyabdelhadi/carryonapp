@@ -1,4 +1,6 @@
 import 'package:carryon/src/data/mappers/json_mappers.dart';
+import 'package:carryon/src/data/services/network/exceptions.dart';
+import 'package:carryon/src/domain/entities/entities.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -26,6 +28,28 @@ void main() {
     expect(p.payoutMethods.last.name, 'bank_transfer');
 
     expect(CatalogMapper.appSettings({}).payments.commissionPercent, 15);
+  });
+
+  test('appSettings reads the live verification switch', () {
+    expect(CatalogMapper.appSettings({}).shuftiLive, isFalse);
+    expect(CatalogMapper.appSettings({'shufti_live': true}).shuftiLive, isTrue);
+  });
+
+  test('identity_live_required becomes a liveRequired identity failure', () {
+    expect(
+      () => Json.requireDone({
+        'msg': 'error',
+        'reason': 'identity_live_required',
+        'error': 'Please update CarryOn.',
+      }),
+      throwsA(
+        isA<IdentityRejectedException>().having(
+          (e) => e.kind,
+          'kind',
+          IdentityVerificationFailureKind.liveRequired,
+        ),
+      ),
+    );
   });
 
   test('parcel order reads the wallet columns', () {

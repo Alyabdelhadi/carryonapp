@@ -20,7 +20,8 @@ class ResetRepositoryUseCase {
   /// injection container.
   void call(Ref ref) {
     ref.container.getAllProviderElements().forEach((element) {
-      if (element.provider.name!.contains('Repository')) {
+      // Hand-written providers (`FutureProvider(...)` etc.) have no name.
+      if (element.provider.name?.contains('Repository') ?? false) {
         ref.invalidate(element.provider);
       }
     });

@@ -10,6 +10,7 @@ AuthRepository authRepository(Ref ref) {
   return AuthRepositoryImpl(
     remote: ref.watch(restClientServiceProvider),
     session: ref.watch(sessionRepositoryProvider),
+    tokens: ref.watch(tokenManagerProvider),
     crashReporter: ref.watch(crashReporterProvider),
   );
 }
@@ -68,14 +69,6 @@ LocationRepository locationRepository(Ref ref) {
 NotificationRepository notificationRepository(Ref ref) {
   return NotificationRepositoryImpl(
     firebaseReady: ref.watch(firebaseReadyProvider),
-    crashReporter: ref.watch(crashReporterProvider),
-  );
-}
-
-@Riverpod(keepAlive: true)
-IdentityVerificationRepository identityVerificationRepository(Ref ref) {
-  return IdentityVerificationRepositoryImpl(
-    remote: ref.watch(restClientServiceProvider),
     crashReporter: ref.watch(crashReporterProvider),
   );
 }

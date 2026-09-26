@@ -23,8 +23,14 @@ class SignupController extends AsyncNotifier<SignupStep?> {
   Future<SignupStep?> build() async => null;
 
   /// Resolves true when the account was created and the session stored.
-  Future<bool> signup(SignupInput input) async {
-    state = const AsyncData(SignupStep.verifyingIdentity);
+  /// [checksIdentity] is false in live verification mode, where signup
+  /// only creates the account.
+  Future<bool> signup(SignupInput input, {bool checksIdentity = true}) async {
+    state = AsyncData(
+      checksIdentity
+          ? SignupStep.verifyingIdentity
+          : SignupStep.creatingAccount,
+    );
     final result = await ref.read(signupUseCaseProvider).call(input);
     if (!ref.mounted) return false;
     switch (result) {

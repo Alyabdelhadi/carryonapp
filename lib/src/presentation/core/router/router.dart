@@ -15,7 +15,9 @@ import '../../features/account/view/wallet_page.dart';
 import '../../features/auth/view/forgot_password_page.dart';
 import '../../features/auth/view/login_page.dart';
 import '../../features/auth/view/signup_page.dart';
+import '../../features/auth/view/verify_identity_page.dart';
 import '../../features/home/view/home_page.dart';
+import '../../features/home/view/update_required_page.dart';
 import '../../features/packages/view/address_picker_page.dart';
 import '../../features/packages/view/matching_packages_page.dart';
 import '../../features/packages/view/order_detail_page.dart';
@@ -28,6 +30,7 @@ import '../../features/trips/view/trips_page.dart';
 import '../application_state/session_status_provider/session_status_provider.dart';
 import '../widgets/navigation_shell.dart';
 import '../widgets/not_found_screen.dart';
+import '../widgets/verified_only.dart';
 import 'redirect_gate.dart';
 import 'route_args.dart';
 import 'router_state/router_state_provider.dart';
@@ -60,6 +63,18 @@ GoRouter goRouter(Ref ref) {
         name: Routes.splash.name,
         pageBuilder: (context, state) =>
             const NoTransitionPage(child: SplashPage()),
+      ),
+      GoRoute(
+        path: Routes.updateRequired.path,
+        name: Routes.updateRequired.name,
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: UpdateRequiredPage()),
+      ),
+      GoRoute(
+        path: Routes.verifyIdentity.path,
+        name: Routes.verifyIdentity.name,
+        pageBuilder: (context, state) =>
+            const NoTransitionPage(child: VerifyIdentityPage()),
       ),
       _shellRoutes(ref),
       ..._authRoutes(ref),

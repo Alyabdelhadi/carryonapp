@@ -6,8 +6,9 @@ List<GoRoute> _packageRoutes(Ref ref) {
       path: Routes.matching.path,
       name: Routes.matching.name,
       parentNavigatorKey: _rootNavigatorKey,
-      pageBuilder: (context, state) =>
-          const MaterialPage(child: MatchingPackagesPage()),
+      pageBuilder: (context, state) => const MaterialPage(
+        child: VerifiedOnly(child: MatchingPackagesPage()),
+      ),
     ),
     GoRoute(
       path: Routes.orderDetail.path,
@@ -32,7 +33,9 @@ List<GoRoute> _packageRoutes(Ref ref) {
         final args = extra is OrderFormArgs
             ? extra
             : const OrderFormArgs(flow: ParcelFlow.send);
-        return MaterialPage(child: OrderFormPage(args: args));
+        return MaterialPage(
+          child: VerifiedOnly(child: OrderFormPage(args: args)),
+        );
       },
     ),
     GoRoute(

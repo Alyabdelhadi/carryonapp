@@ -15,12 +15,6 @@ enum CacheKey {
   /// JSON of the admin-managed UI copy (`getTexts`).
   appTexts,
 
-  /// Epoch millis of the last store-version check.
-  lastUpdateCheck,
-
-  /// Epoch millis until which the user asked not to be reminded to update.
-  updatePostponedUntil,
-
   /// Last known device coordinates, so screens can render before the GPS
   /// fix arrives.
   currentLat,

@@ -30,8 +30,14 @@ class Endpoints {
   static const String userInfo = '/userInfo';
   static const String updateInfo = '/updateInfo';
   static const String deleteUser = '/deleteUser';
-  static const String sendResetLink = '/sendResetLink';
-  static const String resetPassword = '/resetPassword';
+  // Tokens (Sanctum access token + rotating refresh token)
+  static const String authRefresh = '/auth/refresh';
+  static const String authLogout = '/auth/logout';
+
+  // Password reset by emailed 6-digit code
+  static const String passwordResetRequest = '/password/request';
+  static const String passwordResetVerify = '/password/verify';
+  static const String passwordReset = '/password/reset';
   static const String rate = '/rate';
 
   // Catalog
@@ -41,6 +47,8 @@ class Endpoints {
   static const String sliders2 = '/sliders2';
   static const String texts = '/getTexts';
   static const String appVersions = '/appVersions';
+  static const String weights = '/weights';
+  static const String tips = '/tips';
   static const String appSettings = '/appSettings';
   static const String stats = '/stats';
   static const String countries = '/countries';
@@ -77,13 +85,17 @@ class Endpoints {
   static const String markMatchingRead =
       '/carriers/{carrierId}/matching-parcel-orders/mark-read';
 
+  // Identity verification (Shufti runs on the backend)
+  static const String identityVerify = '/identity/verify';
+  static const String identityStatus = '/identity/status';
+  static const String identityLive = '/identity/live';
+
   // Trips
   static const String trips = '/trips';
   static const String tripById = '/trips/{id}';
   static const String tripsByCarrier = '/trips/carrier/{carrierId}';
 
   // Third party
-  static const String shuftiVerify = 'https://api.shuftipro.com/';
   static const String googlePlacesAutocomplete =
       'https://maps.googleapis.com/maps/api/place/autocomplete/json';
   static const String googlePlaceDetails =

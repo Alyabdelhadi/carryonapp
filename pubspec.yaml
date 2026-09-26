@@ -2,7 +2,7 @@ name: carryon
 description: "CarryOn - peer-to-peer parcel delivery. Send, receive or carry packages along your travel routes."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 56.0.0+56
 
 environment:
   sdk: ^3.13.0

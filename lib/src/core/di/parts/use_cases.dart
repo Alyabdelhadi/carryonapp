@@ -15,10 +15,21 @@ LoginUseCase loginUseCase(Ref ref) {
 SignupUseCase signupUseCase(Ref ref) {
   return SignupUseCase(
     ref.watch(authRepositoryProvider),
-    ref.watch(identityVerificationRepositoryProvider),
     ref.watch(notificationRepositoryProvider),
     ref.watch(sessionRepositoryProvider),
-    ref.watch(catalogRepositoryProvider),
+  );
+}
+
+@riverpod
+VerifyIdentityUseCase verifyIdentityUseCase(Ref ref) {
+  return VerifyIdentityUseCase(ref.watch(authRepositoryProvider));
+}
+
+@riverpod
+ResolveIdentityGateUseCase resolveIdentityGateUseCase(Ref ref) {
+  return ResolveIdentityGateUseCase(
+    ref.watch(authRepositoryProvider),
+    ref.watch(sessionRepositoryProvider),
   );
 }
 
@@ -41,8 +52,8 @@ DeleteAccountUseCase deleteAccountUseCase(Ref ref) {
 }
 
 @riverpod
-SendResetLinkUseCase sendResetLinkUseCase(Ref ref) {
-  return SendResetLinkUseCase(ref.watch(authRepositoryProvider));
+PasswordResetUseCase passwordResetUseCase(Ref ref) {
+  return PasswordResetUseCase(ref.watch(authRepositoryProvider));
 }
 
 @riverpod
@@ -116,10 +127,7 @@ GetPaymentMethodsUseCase getPaymentMethodsUseCase(Ref ref) {
 
 @riverpod
 CheckAppUpdateUseCase checkAppUpdateUseCase(Ref ref) {
-  return CheckAppUpdateUseCase(
-    ref.watch(catalogRepositoryProvider),
-    ref.watch(sessionRepositoryProvider),
-  );
+  return CheckAppUpdateUseCase(ref.watch(catalogRepositoryProvider));
 }
 
 // --------------------------------------------------------- parcel orders
@@ -157,6 +165,11 @@ TransitionParcelOrderUseCase transitionParcelOrderUseCase(Ref ref) {
 @riverpod
 ExtendParcelOrderUseCase extendParcelOrderUseCase(Ref ref) {
   return ExtendParcelOrderUseCase(ref.watch(parcelOrderRepositoryProvider));
+}
+
+@riverpod
+GetQuickPicksUseCase getQuickPicksUseCase(Ref ref) {
+  return GetQuickPicksUseCase(ref.watch(catalogRepositoryProvider));
 }
 
 @riverpod

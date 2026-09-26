@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/extensions/localization.dart';
+import '../../../core/application_state/quick_picks_provider.dart';
 import '../../../core/router/route_args.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/section_card.dart';
@@ -13,16 +15,17 @@ import '../widgets/carbon_result_card.dart';
 /// The "Carbon Calculator" (the original `offer` page): pick two airports
 /// and a weight, see the CO₂, trees and money a CarryOn delivery saves
 /// against traditional cargo. [args] pre-fills the route from an order.
-class CarbonCalculatorPage extends StatefulWidget {
+class CarbonCalculatorPage extends ConsumerStatefulWidget {
   const CarbonCalculatorPage({super.key, this.args});
 
   final CarbonCalculatorArgs? args;
 
   @override
-  State<CarbonCalculatorPage> createState() => _CarbonCalculatorPageState();
+  ConsumerState<CarbonCalculatorPage> createState() =>
+      _CarbonCalculatorPageState();
 }
 
-class _CarbonCalculatorPageState extends State<CarbonCalculatorPage> {
+class _CarbonCalculatorPageState extends ConsumerState<CarbonCalculatorPage> {
   static const _other = 'other';
 
   String? _from;
@@ -46,7 +49,10 @@ class _CarbonCalculatorPageState extends State<CarbonCalculatorPage> {
 
     final kg = args.weightKg;
     if (kg != null && kg > 0) {
-      final preset = CarbonCalculator.presetWeightsKg
+      // preset weights (kg) offered before "Other", from the admin
+      final preset = ref
+          .read(quickPicksProvider)
+          .calculatorWeightsKg
           .where((w) => w == kg)
           .firstOrNull;
       if (preset != null) {
@@ -94,6 +100,16 @@ class _CarbonCalculatorPageState extends State<CarbonCalculatorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final presets = ref.watch(quickPicksProvider).calculatorWeightsKg;
+    // The admin's list can change under a selected preset (it loads after
+    // the page opens): keep the number as a custom weight instead.
+    final selected = _weight;
+    if (selected != null &&
+        selected != _other &&
+        !presets.map(_weightKey).contains(selected)) {
+      _customWeight.text = selected;
+      _weight = _other;
+    }
     final space = context.dimensions.space;
     final l10n = context.l10n;
     final airportItems = [
@@ -154,7 +170,8 @@ class _CarbonCalculatorPageState extends State<CarbonCalculatorPage> {
                     initialValue: _weight,
                     isExpanded: true,
                     items: [
-                      for (final w in CarbonCalculator.presetWeightsKg)
+                      for (final w
+                          in ref.watch(quickPicksProvider).calculatorWeightsKg)
                         DropdownMenuItem(
                           value: _weightKey(w),
                           child: Text(l10n.accKgValue(_weightKey(w))),

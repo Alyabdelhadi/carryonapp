@@ -17,7 +17,6 @@ the stored user id is the session and every request carries it.
 
 ## Secrets (first clone)
 
-- Copy `lib/src/core/config/app_secrets.example.dart` to `app_secrets.dart` and fill in the Shufti Pro credentials. The file is git-ignored.
 - Put the Firebase config files in place: `ios/Runner/GoogleService-Info.plist` and `android/app/google-services.json` (both git-ignored). Without them the app runs, but push notifications stay off.
 
 ## Run
@@ -44,9 +43,9 @@ dart run build_runner watch --delete-conflicting-outputs
   Gradle build applies the google-services plugin only when that file
   exists, so the app builds without it (push is disabled at runtime, every
   other feature works). Google Maps key is in `AndroidManifest.xml`.
-- Third-party keys (Google Maps, Shufti Pro) live in
-  `lib/src/core/config/app_config.dart`; they are the same values the Ionic
-  build shipped.
+- The Google Maps key lives in `lib/src/core/config/app_config.dart`.
+  Shufti Pro keys are not in the app: identity checks run on the backend
+  (`SHUFTI_CLIENT_ID` / `SHUFTI_SECRET_KEY` in its `.env`).
 
 ## Layout
 
@@ -82,8 +81,11 @@ navigation, theme). `docs/architecture.md`, `docs/network.md` and
 - Account: profile with stats (rating, packages, trips, trees saved),
   profile edit, saved addresses, carbon calculator, terms, push toggle,
   logout, delete account.
-- Auth: login, signup with selfie + ID verification (Shufti Pro), password
-  reset link.
+- Auth: login, signup with selfie + ID verification (Shufti Pro, run by the
+  backend), forgot password by emailed 6-digit code (`POST /password/request`
+  → `/password/verify` → `/password/reset`;
+  `integration_test/password_reset_test.dart` reads the code from a local
+  backend's mail log).
 
 ## Languages
 
@@ -114,7 +116,19 @@ notification permission alert blanks every screenshot.
 
 ## Admin switches
 
-The backend admin page **App Settings** (`/app-settings`, API `GET /appSettings`) turns the Shufti Pro identity check on or off. When it is off, signup still uploads the selfie and ID for manual review and stores `shufti_status = skipped`; if the request fails the app assumes the check is on.
+The backend admin page **App Settings** (`/app-settings`, API `GET /appSettings`) turns the Shufti Pro identity check on or off; if the request fails the app assumes the check is on.
+
+## Identity verification and app gates
+
+The router (`routerStateProvider`) enforces these gates in order, each re-checked when the app returns to the foreground:
+
+1. **Update required** (`appUpdateProvider`): the store version from `GET /appVersions` is newer than the installed one. Only the update screen shows; there is no "remind me later". Bump the version in the admin only once the new build is live in the store.
+2. **Verify your identity** (`identityGateProvider`, Shufti on): a signed-in account that was never verified (every account created before this feature, or while the switch was off) or whose last check was declined. Only the verification screen shows, plus Logout. It posts the selfie + ID to `POST /identity/verify`.
+3. **Under review**: Shufti had no verdict yet (`identity_status = pending`). The app is usable, but the send / receive / carry screens (`VerifiedOnly`) and Accept on an order show "Account under review" with a "Check again" button (`GET /identity/status`). An `identity` push from the backend re-checks the gate.
+
+Signup posts the photos to `POST /signup`; the backend runs Shufti (about 20 s, the request has a 120 s timeout via `slowRequestKey`) and only creates the account when the check passes. Failures come back with `reason: identity_declined | identity_invalid | identity_unavailable`, mapped to `IdentityVerificationFailure`. The "Verified" badge (`VerifiedBadge`) shows on the account header while the switch is on.
+
+`integration_test/identity_gate_test.dart` walks the gates against a local backend (`CARRYON_SCENARIO=verify | under_review | update`).
 
 ## Credits
 

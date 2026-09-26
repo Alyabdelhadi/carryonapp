@@ -10,6 +10,7 @@ class NetworkConfig {
     this.connectTimeout = const Duration(seconds: 10),
     this.receiveTimeout = const Duration(seconds: 10),
     this.sendTimeout = const Duration(seconds: 10),
+    this.slowRequestTimeout = const Duration(seconds: 120),
     this.defaultHeaders = const {},
   });
 
@@ -17,5 +18,8 @@ class NetworkConfig {
   final Duration connectTimeout;
   final Duration receiveTimeout;
   final Duration sendTimeout;
+
+  /// Send/receive timeout for endpoints marked with `slowRequestKey`.
+  final Duration slowRequestTimeout;
   final Map<String, String> defaultHeaders;
 }

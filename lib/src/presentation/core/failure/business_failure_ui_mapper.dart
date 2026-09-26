@@ -30,10 +30,25 @@ abstract final class BusinessFailureUIMapper {
                 : l10n.identityUnreadableDetail(detail),
           IdentityVerificationFailureKind.unreachable =>
             l10n.identityUnreachable,
+          IdentityVerificationFailureKind.liveRequired =>
+            l10n.identityLiveRequired,
         },
-        action: kind == IdentityVerificationFailureKind.unreachable
+        action:
+            kind == IdentityVerificationFailureKind.unreachable ||
+                kind == IdentityVerificationFailureKind.liveRequired
             ? .retry
             : .inlineFields,
+      );
+    }
+    if (failure.cause case PasswordResetFailure(:final kind)) {
+      return FailureUIModel(
+        message: switch (kind) {
+          PasswordResetFailureKind.invalidCode => l10n.pwdCodeInvalid,
+          PasswordResetFailureKind.expiredCode => l10n.pwdCodeExpired,
+          PasswordResetFailureKind.tooManyAttempts => l10n.pwdCodeLocked,
+          PasswordResetFailureKind.sessionExpired => l10n.pwdSessionExpired,
+        },
+        action: .inlineFields,
       );
     }
     return switch (failure) {

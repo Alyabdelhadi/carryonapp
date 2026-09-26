@@ -7,6 +7,7 @@ import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/app_network_image.dart';
 import '../../../core/widgets/section_card.dart';
 import '../../../core/widgets/text/typography.dart';
+import '../../../core/widgets/verified_badge.dart';
 
 /// Avatar, name and contact lines at the top of the account tab. Tapping
 /// anywhere opens the profile editor, as the original's header did.
@@ -38,6 +39,10 @@ class AccountHeader extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                if (user.isVerified) ...[
+                  Gap(context.dimensions.space.s4),
+                  VerifiedBadge(verified: user.isVerified),
+                ],
                 Gap(context.dimensions.space.s2),
                 BodySmallText.muted(
                   user.email,

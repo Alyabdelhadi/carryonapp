@@ -9,6 +9,7 @@ import 'interceptors/debug_logger_interceptor.dart';
 import 'interceptors/error_attachment_interceptor.dart';
 import 'interceptors/locale_header_interceptor.dart';
 import 'interceptors/refresh_retry_interceptor.dart';
+import 'interceptors/slow_request_interceptor.dart';
 
 /// What [DioBuilder.build] returns: the transport [Dio] and its
 /// [TokenManager], constructed together so their inter-dependencies
@@ -85,7 +86,8 @@ class DioBuilder {
 
     dio.interceptors.addAll([
       if (localeResolver != null) LocaleHeaderInterceptor(localeResolver!),
-      AuthHeaderInterceptor(tokens),
+      SlowRequestInterceptor(config.slowRequestTimeout),
+      AuthHeaderInterceptor(tokens, ownApiBaseUrl: config.baseUrl),
       ErrorAttachmentInterceptor(errorParser),
       ...extraInterceptors,
       ?logger,

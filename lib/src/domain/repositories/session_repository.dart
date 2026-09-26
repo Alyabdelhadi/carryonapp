@@ -22,12 +22,4 @@ abstract interface class SessionRepository {
   AppTexts get cachedTexts;
 
   Future<void> cacheTexts(AppTexts texts);
-
-  DateTime? get lastUpdateCheck;
-
-  Future<void> setLastUpdateCheck(DateTime at);
-
-  DateTime? get updatePostponedUntil;
-
-  Future<void> setUpdatePostponedUntil(DateTime? until);
 }

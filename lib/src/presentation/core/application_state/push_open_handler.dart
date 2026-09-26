@@ -8,6 +8,7 @@ import '../../../core/di/dependency_injection.dart';
 import '../../../core/logger/log.dart';
 import '../router/router.dart';
 import '../router/routes.dart';
+import 'app_gate_provider/app_gate_provider.dart';
 
 /// Opens the order a push notification is about when the user taps it
 /// (`order_id` in the message data, set by the backend for payment and
@@ -37,6 +38,18 @@ void attachPushOpenHandler(ProviderContainer container) {
     }
   }
 
+  // The backend pushes `type: identity` when a pending Shufti check gets
+  // its verdict; re-evaluate the gate so the app unlocks (or asks again).
+  void identityChanged(RemoteMessage message) {
+    if (message.data['type'] == 'identity') {
+      container.invalidate(identityGateProvider);
+    }
+  }
+
   unawaited(FirebaseMessaging.instance.getInitialMessage().then(open));
-  FirebaseMessaging.onMessageOpenedApp.listen(open);
+  FirebaseMessaging.onMessageOpenedApp.listen((message) {
+    identityChanged(message);
+    unawaited(open(message));
+  });
+  FirebaseMessaging.onMessage.listen(identityChanged);
 }

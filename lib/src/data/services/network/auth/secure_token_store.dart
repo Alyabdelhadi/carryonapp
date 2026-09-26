@@ -29,6 +29,7 @@ class SecureTokenStore implements TokenStore {
   static const _keys = <TokenKey, String>{
     .access: 'auth.access_token',
     .refresh: 'auth.refresh_token',
+    .expiresAt: 'auth.access_expires_at',
   };
 
   String _keyFor(TokenKey key) => _keys[key]!;

@@ -23,6 +23,7 @@ class OrderFormPackageSection extends ConsumerWidget {
     required this.descriptionController,
     required this.valueController,
     required this.weightController,
+    required this.weightPicks,
   });
 
   final int? selectedCategoryId;
@@ -31,11 +32,13 @@ class OrderFormPackageSection extends ConsumerWidget {
   final TextEditingController valueController;
   final TextEditingController weightController;
 
+  /// Weight quick picks in kg ("0.5", "2"), from the admin's Weights page.
+  final List<String> weightPicks;
+
   /// The unit appended to the weight the API receives ("2 kg"); a wire
   /// value, so it is not localized. The field shows [AppLocalizations.kgUnit].
   static const String weightUnit = 'kg';
   static const List<String> valuePicks = ['50', '100', '250', '500'];
-  static const List<String> weightPicks = ['0.5', '1', '2', '5', '10', '20'];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

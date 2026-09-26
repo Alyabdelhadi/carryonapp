@@ -1,9 +1,6 @@
-import 'app_secrets.dart';
-
 /// Third-party keys the app ships with. The Google Maps key is restricted
-/// to this app's bundle id and is also embedded in the native projects;
-/// the Shufti credentials live in the git-ignored `app_secrets.dart`
-/// (copy `app_secrets.example.dart` to create it).
+/// to this app's bundle id and is also embedded in the native projects.
+/// Shufti Pro identity checks run on the backend; the app holds no keys.
 abstract final class AppConfig {
   static const String appName = 'CarryOn';
 
@@ -13,10 +10,6 @@ abstract final class AppConfig {
   static const String googleMapsApiKey =
       'AIzaSyBE_4VtJYMqVKPEkR75wfiopt9c08WuHag';
 
-  /// Shufti Pro identity verification (selfie + document match at signup).
-  static const String shuftiClientId = AppSecrets.shuftiClientId;
-  static const String shuftiSecretKey = AppSecrets.shuftiSecretKey;
-
   /// FCM topic every install subscribes to for broadcast pushes.
   static const String broadcastTopic = 'carryon';
 
@@ -25,10 +18,4 @@ abstract final class AppConfig {
 
   /// Country pre-selected in phone-code pickers.
   static const String defaultCountryName = 'Lebanon';
-
-  /// How often the home screen re-checks the store version.
-  static const Duration updateCheckInterval = Duration(hours: 6);
-
-  /// Minimum gap between two update prompts.
-  static const Duration updateCheckCooldown = Duration(hours: 24);
 }

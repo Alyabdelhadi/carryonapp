@@ -1,3 +1,5 @@
+import 'identity_status.dart';
+
 /// A CarryOn account. The same record acts as a sender and as a carrier;
 /// `role` is contextual and the backend reports `carrier` from `userInfo`.
 class AppUser {
@@ -19,6 +21,7 @@ class AppUser {
     this.packagesCount,
     this.averageRating,
     this.ratingsCount,
+    this.identityStatus = IdentityStatus.none,
   });
 
   final int id;
@@ -43,6 +46,12 @@ class AppUser {
   final double? averageRating;
   final int? ratingsCount;
 
+  /// The backend's Shufti check. Whether it matters at all depends on the
+  /// admin switch (`AppSettings.shuftiEnabled`).
+  final IdentityStatus identityStatus;
+
+  bool get isVerified => identityStatus == IdentityStatus.verified;
+
   String get firstName => name.trim().split(' ').first;
 
   bool get isCarrier => role == 'carrier';
@@ -56,6 +65,7 @@ class AppUser {
     String? city,
     String? selfie,
     String? identity,
+    IdentityStatus? identityStatus,
   }) {
     return AppUser(
       id: id,
@@ -75,6 +85,7 @@ class AppUser {
       packagesCount: packagesCount,
       averageRating: averageRating,
       ratingsCount: ratingsCount,
+      identityStatus: identityStatus ?? this.identityStatus,
     );
   }
 }

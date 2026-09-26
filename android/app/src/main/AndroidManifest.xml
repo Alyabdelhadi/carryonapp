@@ -58,5 +58,10 @@
             <action android:name="android.intent.action.VIEW"/>
             <data android:scheme="https"/>
         </intent>
+        <!-- live identity verification opens Shufti's page in a Custom Tab
+             (camera access); without this Android 11+ cannot find one -->
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService"/>
+        </intent>
     </queries>
 </manifest>

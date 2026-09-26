@@ -114,6 +114,7 @@
     }
   },
   "identityUnreachable": "Verification error. Please try again.",
+  "identityLiveRequired": "Identity verification has changed. Please try again.",
   "homeGreetingGuest": "Hello, Guest 😊",
   "homeGreeting": "Hello, {name} 😊",
   "@homeGreeting": {
@@ -139,9 +140,7 @@
       }
     }
   },
-  "homeRemindTomorrow": "Remind Tomorrow",
-  "homeUpdateNow": "✨ Update Now",
-  "homeUpdateReminderToast": "⏰ We'll check for updates again tomorrow",
+  "homeUpdateNow": "Update now",
   "coreSignInToContinue": "Sign in to continue",
   "coreLoginToAccessPage": "Please login to access this page.",
   "coreAddressTitle": "Address",
@@ -164,7 +163,6 @@
   "authForgotSubtitle": "Don't worry, you can reset it here",
   "authEnterRegisteredEmail": "Enter Registered Email",
   "authReset": "Reset",
-  "authResetLinkSent": "A reset link has been sent to your email address",
   "authJoinPrompt": "Do you want to join {app}?",
   "@authJoinPrompt": {
     "placeholders": {
@@ -178,6 +176,7 @@
   "authFullNameRequired": "Please enter your full name",
   "authPhoneRequired": "Please enter your phone number",
   "authUploadBothDocuments": "Please upload both a selfie and an identity document.",
+  "authUploadSelfie": "Please add a selfie.",
   "authSelfieTitle": "Upload a Selfie",
   "authSelfieSubtitle": "Verify your liveliness",
   "authIdentityTitle": "Upload ID/Passport",
@@ -293,7 +292,9 @@
   "pkgPackageTypeRequired": "Package type is required.",
   "pkgPackageValueRequired": "Package value is required.",
   "pkgWeightRequired": "Package weight is required.",
+  "pkgWeightAboveZero": "Enter a weight greater than 0.",
   "pkgRewardRequired": "Carrier reward is required.",
+  "pkgRewardAboveZero": "Enter a reward greater than 0.",
   "pkgNeededBeforeRequired": "Please select the date the package is needed before.",
   "pkgLoginRequired": "Please login to access this page.",
   "pkgSenderContactSubtitle": "Who hands the package to the carrier",
@@ -873,5 +874,81 @@
   "walSubmit": "Send request",
   "walAmountInvalid": "Enter a valid amount.",
   "walDetailsRequired": "Please fill in where to send the money.",
-  "walMethodRequired": "Please choose a payout method."
+  "walMethodRequired": "Please choose a payout method.",
+  "updateRequiredTitle": "Update required",
+  "updateRequiredBody": "Version {latestVersion} of CarryOn is available. You're on {currentVersion}. Please update to keep using the app.",
+  "@updateRequiredBody": {
+    "placeholders": {
+      "latestVersion": {
+        "type": "String"
+      },
+      "currentVersion": {
+        "type": "String"
+      }
+    }
+  },
+  "updateRequiredStoreError": "Could not open the store. Please update CarryOn from the App Store or Google Play.",
+  "idvTitle": "Verify your identity",
+  "idvSubtitle": "To keep CarryOn safe, every member verifies their identity once. Take a selfie and a photo of your ID or passport to continue using the app.",
+  "idvDeclinedNote": "Your last verification didn't pass. Please retake both photos in good light.",
+  "idvSubmit": "Verify now",
+  "idvVerifying": "Verifying your identity… this can take up to a minute.",
+  "idvVerifiedToast": "You're verified! Welcome to CarryOn.",
+  "idvPrivacyNote": "Your photos are checked securely by our verification partner and are only used to confirm your identity.",
+  "idvUnderReviewTitle": "Account under review",
+  "idvUnderReviewBody": "We're verifying your identity. You'll be able to send, receive and carry packages once your account is verified. We'll notify you as soon as it's done.",
+  "idvCheckStatus": "Check again",
+  "idvStillUnderReview": "Your account is still under review.",
+  "idvUnderReviewSnack": "Your account is under review. You'll be able to send, receive or carry packages once it's verified.",
+  "idvLiveSubtitle": "To keep CarryOn safe, every member verifies their identity once. It takes about two minutes on our verification partner's secure page.",
+  "idvLiveStepSelfie": "Take a live selfie. You may be asked to move your head or blink.",
+  "idvLiveStepDocument": "Scan your ID card, passport or driving licence.",
+  "idvLiveStepLight": "Find good light and keep your document at hand.",
+  "idvLiveDeclinedNote": "Your last verification didn't pass. Please try again in good light, with your face and document clearly visible.",
+  "idvLiveStart": "Start verification",
+  "idvLiveCheck": "I've finished, check my result",
+  "idvLiveRestart": "Start again",
+  "idvLiveOpening": "Opening secure verification…",
+  "idvLiveChecking": "Checking your verification…",
+  "idvLiveNotFinished": "We haven't received your verification yet. If you just finished, check again in a moment.",
+  "idvLiveOpenFailed": "Could not open the verification page. Please try again.",
+  "verifiedBadge": "Verified",
+  "pwdSendCode": "Send code",
+  "pwdCodeTitle": "Check your email",
+  "pwdCodeSubtitle": "Enter the 6-digit code we sent to {email}. It expires in 10 minutes.",
+  "@pwdCodeSubtitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "pwdCodeLabel": "6-digit code",
+  "pwdCodeRequired": "Enter the 6-digit code from the email.",
+  "pwdVerify": "Verify code",
+  "pwdResend": "Resend code",
+  "pwdResendIn": "Resend code in {seconds}s",
+  "@pwdResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "pwdCodeSentToast": "If this email is registered, a code is on its way.",
+  "pwdChangeEmail": "Use a different email",
+  "pwdNewTitle": "Set a new password",
+  "pwdNewSubtitle": "Choose a password with at least 6 characters.",
+  "pwdNewPassword": "New password",
+  "pwdConfirmPassword": "Confirm new password",
+  "pwdTooShort": "Use at least 6 characters.",
+  "pwdMismatch": "Passwords do not match.",
+  "pwdSave": "Save password",
+  "pwdChangedToast": "Password changed. You can log in now.",
+  "pwdCodeInvalid": "That code is incorrect. Please check the email and try again.",
+  "pwdCodeExpired": "This code has expired. Please request a new one.",
+  "pwdCodeLocked": "Too many incorrect attempts. Please request a new code.",
+  "pwdSessionExpired": "Your reset session expired. Please request a new code.",
+  "accCurrentPassword": "Current password",
+  "accCurrentPasswordRequired": "Enter your current password to set a new one."
 }

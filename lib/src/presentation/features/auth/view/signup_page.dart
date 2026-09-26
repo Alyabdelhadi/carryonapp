@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/extensions/localization.dart';
 import '../../../../domain/entities/entities.dart';
+import '../../../core/application_state/app_settings_provider/app_settings_provider.dart';
 import '../../../core/extensions/app_texts_extension.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
@@ -24,7 +25,9 @@ const _defaultCountryName = 'Lebanon';
 
 /// Account creation: name, phone with country code, email, password, a
 /// selfie and an identity document, and the terms consent. Submitting runs
-/// the identity check and then creates the account.
+/// the identity check and then creates the account. In live verification
+/// mode only the selfie (profile photo) is asked for: the identity check
+/// happens afterwards on Shufti's page (see `VerifyIdentityPage`).
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
 
@@ -73,9 +76,19 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final live = ref.read(appSettingsProvider).value?.shuftiLive ?? false;
     final selfie = _selfie;
-    final identity = _identity;
-    if (selfie == null || identity == null) {
+    final identity = live ? null : _identity;
+    if (selfie == null) {
+      AppFeedback.toast(
+        context,
+        live
+            ? context.l10n.authUploadSelfie
+            : context.l10n.authUploadBothDocuments,
+      );
+      return;
+    }
+    if (!live && identity == null) {
       AppFeedback.toast(context, context.l10n.authUploadBothDocuments);
       return;
     }
@@ -90,8 +103,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
             phone: _fullPhone(country),
             password: _password.text,
             selfiePath: selfie.path,
-            identityPath: identity.path,
+            identityPath: identity?.path,
           ),
+          checksIdentity: !live,
         );
     if (!ok || !mounted) return;
     context.goNamed(Routes.account.name);
@@ -106,6 +120,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     final state = ref.watch(signupControllerProvider);
     final step = state.value;
     final isBusy = step != null;
+    final live = ref.watch(appSettingsProvider).value?.shuftiLive ?? false;
     final l10n = context.l10n;
 
     return Scaffold(
@@ -135,6 +150,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 country: country,
                 selfie: _selfie,
                 identity: _identity,
+                askIdentity: !live,
                 agreed: _agreed,
                 enabled: !isBusy,
                 onCountry: (c) => setState(() => _pickedCountry = c),
@@ -145,7 +161,10 @@ class _SignupPageState extends ConsumerState<SignupPage> {
               ),
             ),
           ),
-          if (isBusy) Positioned.fill(child: SignupProgressOverlay(step: step)),
+          if (isBusy)
+            Positioned.fill(
+              child: SignupProgressOverlay(step: step, checksIdentity: !live),
+            ),
         ],
       ),
     );
@@ -161,6 +180,7 @@ class _SignupForm extends ConsumerWidget {
     required this.country,
     required this.selfie,
     required this.identity,
+    required this.askIdentity,
     required this.agreed,
     required this.enabled,
     required this.onCountry,
@@ -177,6 +197,9 @@ class _SignupForm extends ConsumerWidget {
   final Country? country;
   final PickedDocument? selfie;
   final PickedDocument? identity;
+
+  /// False in live verification mode: the ID is scanned after signup.
+  final bool askIdentity;
   final bool agreed;
   final bool enabled;
   final ValueChanged<Country> onCountry;
@@ -267,16 +290,18 @@ class _SignupForm extends ConsumerWidget {
             preferFrontCamera: true,
             enabled: enabled,
           ),
-          Gap(space.s12),
-          DocumentUploadTile(
-            icon: Icons.badge_outlined,
-            title: l10n.authIdentityTitle,
-            subtitle: l10n.authIdentitySubtitle,
-            file: identity,
-            onChanged: onIdentity,
-            allowPdf: true,
-            enabled: enabled,
-          ),
+          if (askIdentity) ...[
+            Gap(space.s12),
+            DocumentUploadTile(
+              icon: Icons.badge_outlined,
+              title: l10n.authIdentityTitle,
+              subtitle: l10n.authIdentitySubtitle,
+              file: identity,
+              onChanged: onIdentity,
+              allowPdf: true,
+              enabled: enabled,
+            ),
+          ],
           Gap(space.s16),
           TermsCheckbox(
             value: agreed,

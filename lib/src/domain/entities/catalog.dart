@@ -189,12 +189,18 @@ class AppVersionInfo {
 class AppSettings {
   const AppSettings({
     this.shuftiEnabled = true,
+    this.shuftiLive = false,
     this.payments = const PaymentRules(),
   });
 
   /// When false, signup skips the Shufti identity check and only uploads
   /// the photos for manual review.
   final bool shuftiEnabled;
+
+  /// With [shuftiEnabled]: verification happens live on Shufti's own page
+  /// (selfie with liveness check + ID scan) instead of uploaded photos,
+  /// and signup asks for no ID document.
+  final bool shuftiLive;
 
   final PaymentRules payments;
 }
@@ -250,4 +256,35 @@ class HomeStats {
   final int users;
   final int treesSaved;
   final int cities;
+}
+
+/// The admin-edited quick picks: weights (kg) for the order form and the
+/// carbon calculator (`/weights`), and reward amounts for the order form
+/// (`/tips`, 0 = Free). [defaults] are the values the app shipped with.
+class QuickPicks {
+  const QuickPicks({
+    required this.orderWeightsKg,
+    required this.calculatorWeightsKg,
+    required this.rewards,
+  });
+
+  final List<double> orderWeightsKg;
+  final List<double> calculatorWeightsKg;
+
+  /// Reward amounts in the payment currency; 0 is "Free".
+  final List<double> rewards;
+
+  static const defaults = QuickPicks(
+    orderWeightsKg: [0.5, 1, 2, 5, 10, 20],
+    calculatorWeightsKg: [0.5, 1, 2, 3, 5, 7, 10, 15, 23],
+    rewards: [0, 10, 20, 50, 100, 150, 200],
+  );
+
+  /// "0.5", "2" — how a quick pick reads on a chip and on the wire.
+  static String format(double value) {
+    final fixed = value.toStringAsFixed(2);
+    return fixed.contains('.')
+        ? fixed.replaceFirst(RegExp(r'\.?0+$'), '')
+        : fixed;
+  }
 }

@@ -96,6 +96,14 @@ final class GetPaymentMethodsUseCase {
       catalog.paymentMethods();
 }
 
+final class GetQuickPicksUseCase {
+  GetQuickPicksUseCase(this.catalog);
+
+  final CatalogRepository catalog;
+
+  Future<Result<QuickPicks, BusinessFailure>> call() => catalog.quickPicks();
+}
+
 final class GetAppSettingsUseCase {
   GetAppSettingsUseCase(this.catalog);
 

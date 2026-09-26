@@ -4,6 +4,7 @@ export 'app_user.dart';
 export 'auth_inputs.dart';
 export 'catalog.dart';
 export 'geo.dart';
+export 'identity_status.dart';
 export 'parcel_order.dart';
 export 'parcel_order_draft.dart';
 export 'payment.dart';

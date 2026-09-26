@@ -8,13 +8,11 @@ class SignupInput {
     required this.phone,
     required this.password,
     required this.selfiePath,
-    required this.identityPath,
+    this.identityPath,
     this.country,
     this.city,
     this.referralCode,
     this.role = 0,
-    this.shuftiReference,
-    this.shuftiStatus,
   });
 
   final String name;
@@ -28,9 +26,10 @@ class SignupInput {
   /// 1 when the user opted into carrying packages.
   final int role;
   final String selfiePath;
-  final String identityPath;
-  final String? shuftiReference;
-  final String? shuftiStatus;
+
+  /// Null in live verification mode, where the ID is scanned on Shufti's
+  /// page after signup.
+  final String? identityPath;
 }
 
 /// Fields the profile screen can change. Null photo paths keep the
@@ -43,6 +42,7 @@ class ProfileUpdateInput {
     this.country,
     this.city,
     this.password,
+    this.currentPassword,
     this.selfiePath,
     this.identityPath,
   });
@@ -53,40 +53,60 @@ class ProfileUpdateInput {
   final String? country;
   final String? city;
   final String? password;
+
+  /// Required by the backend whenever [password] is set.
+  final String? currentPassword;
   final String? selfiePath;
   final String? identityPath;
 }
 
-/// Outcome of a Shufti Pro selfie + document check.
-class IdentityVerification {
-  const IdentityVerification({
-    required this.reference,
-    required this.event,
-    this.message,
-  });
+/// Why the backend's identity check (signup or re-verification) did not
+/// pass. Carried as the `cause` of a [BusinessFailure] so the UI can show
+/// localized copy; [detail] is Shufti's own English explanation when it
+/// gave one. `unreachable` means no verdict: try again later.
+enum IdentityVerificationFailureKind {
+  declined,
+  invalid,
+  unreachable,
 
-  final String reference;
-
-  /// `verification.accepted`, `verification.declined`, `request.pending`,
-  /// or `request.invalid` when Shufti could not read the photos.
-  final String event;
-
-  /// Shufti's explanation for a declined or invalid request.
-  final String? message;
-
-  bool get isDeclined => event == 'verification.declined';
-
-  bool get isInvalid => event == 'request.invalid';
+  /// The admin switched to live verification; uploaded photos are refused.
+  liveRequired,
 }
-
-/// Why signup could not pass the identity check. Carried as the `cause`
-/// of a [BusinessFailure] so the UI can show localized copy; [detail] is
-/// Shufti's own English explanation when it gave one.
-enum IdentityVerificationFailureKind { declined, invalid, unreachable }
 
 class IdentityVerificationFailure {
   const IdentityVerificationFailure(this.kind, {this.detail});
 
   final IdentityVerificationFailureKind kind;
   final String? detail;
+}
+
+/// Proof that the emailed reset code was right: the one-time token the
+/// backend issued for setting a new password.
+class PasswordResetTicket {
+  const PasswordResetTicket({required this.userId, required this.token});
+
+  final int userId;
+  final String token;
+}
+
+/// Why a password-reset step was refused. Carried as the `cause` of a
+/// [BusinessFailure] so the UI shows localized copy.
+enum PasswordResetFailureKind {
+  /// Wrong code.
+  invalidCode,
+
+  /// The code is older than 10 minutes.
+  expiredCode,
+
+  /// Five wrong tries; a new code is needed.
+  tooManyAttempts,
+
+  /// The reset session (token) expired or was used; start again.
+  sessionExpired,
+}
+
+class PasswordResetFailure {
+  const PasswordResetFailure(this.kind);
+
+  final PasswordResetFailureKind kind;
 }

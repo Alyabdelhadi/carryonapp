@@ -1,24 +1,17 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-import '../../../../core/config/app_config.dart';
-import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/extensions/localization.dart';
-import '../../../../data/services/network/endpoints.dart';
 import '../../../../domain/entities/entities.dart';
 import '../../../core/extensions/app_texts_extension.dart';
 import '../../../core/router/route_args.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/failure_view.dart';
-import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/login_required_view.dart';
 import '../../../core/widgets/text/typography.dart';
 import '../riverpod/connectivity_provider.dart';
@@ -28,13 +21,11 @@ import '../widgets/home_header.dart';
 import '../widgets/home_loading_placeholder.dart';
 import '../widgets/offline_view.dart';
 import '../widgets/service_card.dart';
-import '../widgets/update_prompt_dialog.dart';
 import '../widgets/home_stats_row.dart';
 
 /// The home tab: greeting header, banner carousel, the three service
-/// actions and the second banner row. Goes offline with a retry view, and
-/// checks the store version shortly after the first build and every
-/// [AppConfig.updateCheckInterval] while it lives.
+/// actions and the second banner row. Goes offline with a retry view. The
+/// store-version check is a router gate (`appUpdateProvider`).
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
@@ -43,75 +34,6 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  static const _initialUpdateCheckDelay = Duration(seconds: 3);
-
-  Timer? _initialUpdateCheck;
-  Timer? _periodicUpdateCheck;
-  bool _updatePromptOpen = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initialUpdateCheck = Timer(_initialUpdateCheckDelay, _checkForUpdates);
-    _periodicUpdateCheck = Timer.periodic(
-      AppConfig.updateCheckInterval,
-      (_) => _checkForUpdates(),
-    );
-  }
-
-  @override
-  void dispose() {
-    _initialUpdateCheck?.cancel();
-    _periodicUpdateCheck?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _checkForUpdates() async {
-    if (_updatePromptOpen) return;
-    final String currentVersion;
-    try {
-      currentVersion = (await PackageInfo.fromPlatform()).version;
-    } on Object {
-      return;
-    }
-    if (!mounted) return;
-
-    final useCase = ref.read(checkAppUpdateUseCaseProvider);
-    final decision = await useCase.call(
-      currentVersion: currentVersion,
-      isIos: Platform.isIOS,
-    );
-    if (!mounted || !decision.shouldPrompt) return;
-
-    _updatePromptOpen = true;
-    final l10n = context.l10n;
-    final choice = await showDialog<UpdateChoice>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => UpdatePromptDialog(
-        currentVersion: decision.currentVersion,
-        latestVersion: decision.latestVersion!,
-      ),
-    );
-    _updatePromptOpen = false;
-    if (!mounted) return;
-
-    switch (choice) {
-      case UpdateChoice.remindTomorrow:
-        await useCase.postpone();
-        if (!mounted) return;
-        AppFeedback.toast(context, l10n.homeUpdateReminderToast);
-      case UpdateChoice.updateNow:
-        await useCase.clearPostpone();
-        final store = Uri.parse(
-          Platform.isIOS ? Endpoints.appStoreUrl : Endpoints.playStoreUrl,
-        );
-        await launchUrl(store, mode: LaunchMode.externalApplication);
-      case null:
-        break;
-    }
-  }
-
   Future<void> _refresh() async {
     ref
       ..invalidate(homeSlidersProvider)

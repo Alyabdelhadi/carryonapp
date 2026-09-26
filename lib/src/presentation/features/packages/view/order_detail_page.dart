@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/base/result.dart';
 import '../../../../core/extensions/localization.dart';
 import '../../../../domain/entities/entities.dart';
+import '../../../core/application_state/app_gate_provider/app_gate_provider.dart';
 import '../../../core/application_state/session_status_provider/session_status_provider.dart';
 import '../../../core/router/route_args.dart';
 import '../../../core/router/routes.dart';
@@ -131,6 +132,10 @@ class _OrderDetailBodyState extends ConsumerState<_OrderDetailBody> {
 
   Future<void> _accept(int userId) async {
     final l10n = context.l10n;
+    if (ref.read(isUnderReviewProvider)) {
+      AppFeedback.toast(context, l10n.idvUnderReviewSnack);
+      return;
+    }
     final ok = await AppFeedback.confirm(
       context,
       title: l10n.pkgAcceptConfirmTitle,

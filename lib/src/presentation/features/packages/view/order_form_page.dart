@@ -9,6 +9,7 @@ import '../../../../core/base/result.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/extensions/localization.dart';
 import '../../../../domain/entities/entities.dart';
+import '../../../core/application_state/quick_picks_provider.dart';
 import '../../../core/application_state/session_status_provider/session_status_provider.dart';
 import '../../../core/extensions/app_texts_extension.dart';
 import '../../../core/router/route_args.dart';
@@ -53,15 +54,10 @@ class OrderFormPage extends ConsumerStatefulWidget {
 }
 
 class _OrderFormPageState extends ConsumerState<OrderFormPage> {
-  /// The Ionic `tips` list.
-  static const List<String> _rewardOptions = [
-    OrderFormRewardSection.free,
-    '10',
-    '20',
-    '50',
-    '100',
-    '150',
-    '200',
+  /// The reward chips: the admin's Tips page (0 is "Free"), then "Other".
+  List<String> get _rewardOptions => [
+    for (final amount in ref.read(quickPicksProvider).rewards)
+      amount == 0 ? OrderFormRewardSection.free : QuickPicks.format(amount),
     OrderFormRewardSection.other,
   ];
 
@@ -76,6 +72,7 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
   final _valueController = TextEditingController();
   final _weightController = TextEditingController();
   final _customRewardController = TextEditingController();
+  final _customRewardFocus = FocusNode();
 
   /// 0 = "Where & who", 1 = "What & how".
   int _step = 0;
@@ -143,6 +140,7 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
     _valueController.dispose();
     _weightController.dispose();
     _customRewardController.dispose();
+    _customRewardFocus.dispose();
     super.dispose();
   }
 
@@ -422,16 +420,17 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
             : chip;
       }
     });
+    // WHY: `autofocus` is ignored while another field (e.g. weight) holds
+    // focus; move the keyboard to the amount box once it is built.
+    if (_rewardChip == OrderFormRewardSection.other) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _customRewardFocus.requestFocus();
+      });
+    }
   }
 
-  void _onAddReward() {
-    final custom = _customRewardController.text.trim();
-    if (custom.isEmpty) {
-      AppFeedback.toast(context, context.l10n.pkgRewardRequired);
-      return;
-    }
-    setState(() => _reward = custom);
-    FocusScope.of(context).unfocus();
+  void _onCustomReward(String value) {
+    setState(() => _reward = value.trim());
   }
 
   Future<void> _pickDate() async {
@@ -487,8 +486,12 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
     if (_categoryId == null) return l10n.pkgPackageTypeRequired;
     if (_valueText == null) return l10n.pkgPackageValueRequired;
     if (_weightText == null) return l10n.pkgWeightRequired;
+    if (_weightKg! <= 0) return l10n.pkgWeightAboveZero;
     if (_reward.isEmpty || _reward == OrderFormRewardSection.other) {
       return l10n.pkgRewardRequired;
+    }
+    if (_rewardChip == OrderFormRewardSection.other && _numericReward == null) {
+      return l10n.pkgRewardAboveZero;
     }
     if (_paysByCard && _numericReward == null) {
       return l10n.payNumericRewardRequired;
@@ -582,6 +585,7 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final quickPicks = ref.watch(quickPicksProvider);
     final user = ref.watch(currentUserProvider);
     final countries = ref.watch(orderFormCountriesProvider);
     final submitting = ref.watch(orderFormSubmitProvider).isLoading;
@@ -649,6 +653,9 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
             descriptionController: _descriptionController,
             valueController: _valueController,
             weightController: _weightController,
+            weightPicks: [
+              for (final kg in quickPicks.orderWeightsKg) QuickPicks.format(kg),
+            ],
           ),
           OrderFormDeliverySection(
             neededSoon: _neededSoon,
@@ -669,7 +676,8 @@ class _OrderFormPageState extends ConsumerState<OrderFormPage> {
             rewardChip: _rewardChip,
             onRewardChip: _onRewardChip,
             customRewardController: _customRewardController,
-            onAddReward: _onAddReward,
+            customRewardFocus: _customRewardFocus,
+            onCustomReward: _onCustomReward,
           ),
           OrderFormPaymentSection(
             selectedId: _paymentMethodId,

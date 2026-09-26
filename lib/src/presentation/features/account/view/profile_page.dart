@@ -37,6 +37,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   late final TextEditingController _country;
   late final TextEditingController _city;
   late final TextEditingController _password;
+  late final TextEditingController _currentPassword;
 
   Map<String, String> _fieldErrors = const {};
   bool _obscure = true;
@@ -52,6 +53,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     _country = TextEditingController(text: user?.country ?? '');
     _city = TextEditingController(text: user?.city ?? '');
     _password = TextEditingController();
+    _currentPassword = TextEditingController();
   }
 
   @override
@@ -62,6 +64,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     _country.dispose();
     _city.dispose();
     _password.dispose();
+    _currentPassword.dispose();
     super.dispose();
   }
 
@@ -86,6 +89,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             country: _optional(_country.text),
             city: _optional(_city.text),
             password: _optional(_password.text),
+            currentPassword: _optional(_currentPassword.text),
           ),
         );
     if (!mounted) return;
@@ -223,6 +227,23 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                           LabelText(l10n.accChangePassword),
                           Gap(space.s4),
                           BodySmallText.muted(l10n.accLeaveEmptyPassword),
+                          Gap(space.s12),
+                          TextFormField(
+                            controller: _currentPassword,
+                            obscureText: _obscure,
+                            textInputAction: TextInputAction.next,
+                            autofillHints: const [AutofillHints.password],
+                            validator: (v) =>
+                                _password.text.isNotEmpty && (v ?? '').isEmpty
+                                ? l10n.accCurrentPasswordRequired
+                                : null,
+                            textDirection: TextDirection.ltr,
+                            textAlign: TextAlign.start,
+                            decoration: InputDecoration(
+                              labelText: l10n.accCurrentPassword,
+                              prefixIcon: const Icon(Icons.lock_clock_outlined),
+                            ),
+                          ),
                           Gap(space.s12),
                           TextFormField(
                             controller: _password,

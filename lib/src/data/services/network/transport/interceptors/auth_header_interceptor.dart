@@ -29,9 +29,14 @@ import '../../request_auth.dart';
 /// When a header is attached, the request is stamped with [authAttachedKey]
 /// so `RefreshRetryInterceptor` knows a 401 on it is refresh-eligible.
 class AuthHeaderInterceptor extends Interceptor {
-  const AuthHeaderInterceptor(this._tokens);
+  const AuthHeaderInterceptor(this._tokens, {this.ownApiBaseUrl});
 
   final TokenManager _tokens;
+
+  /// Unmarked requests to this API get the token when one exists
+  /// ([RequestAuth.optional]); every other host (Google, Shufti, Stripe)
+  /// stays [RequestAuth.public], so the token never leaves our backend.
+  final String? ownApiBaseUrl;
 
   static const _headerName = 'Authorization';
 
@@ -41,10 +46,14 @@ class AuthHeaderInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     final raw = options.extra[requestAuthKey];
-    final mode = raw is RequestAuth ? raw : RequestAuth.public;
+    final mode = raw is RequestAuth
+        ? raw
+        : _isOwnApi(options.uri)
+        ? RequestAuth.optional
+        : RequestAuth.public;
     if (mode == .public) return handler.next(options);
 
-    var token = await _tokens.accessToken;
+    var token = await _tokens.validAccessToken();
     if (token == null || token.isEmpty) {
       token = await _recoveredToken();
     }
@@ -63,6 +72,16 @@ class AuthHeaderInterceptor extends Interceptor {
     options.headers[_headerName] = 'Bearer $token';
     options.extra[authAttachedKey] = true;
     handler.next(options);
+  }
+
+  bool _isOwnApi(Uri uri) {
+    final base = ownApiBaseUrl;
+    if (base == null) return false;
+    final own = Uri.parse(base);
+    return uri.scheme == own.scheme &&
+        uri.host == own.host &&
+        uri.port == own.port &&
+        uri.path.startsWith(own.path);
   }
 
   /// Attempts to recover a missing access token via refresh. Returns `null`

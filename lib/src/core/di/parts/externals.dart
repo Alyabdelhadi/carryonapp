@@ -17,9 +17,9 @@ bool firebaseReady(Ref ref) => false;
 
 /// The single place to adapt the network stack. Every [DioBuilder]
 /// argument below is a deliberate seam; change it here, never in
-/// transport code. The CarryOn backend has no bearer tokens, so the token
-/// store and refresh endpoint are inert: every endpoint is unmarked
-/// (public) and identifies the user by a `user_id` parameter.
+/// transport code. Requests to the CarryOn API carry the Sanctum access
+/// token when signed in; `/auth/refresh` swaps the rotating refresh token
+/// for a new pair (see `TokenManager`).
 @Riverpod(keepAlive: true)
 NetworkStack networkStack(Ref ref) {
   final logger = kDebugMode
@@ -35,7 +35,7 @@ NetworkStack networkStack(Ref ref) {
     ),
     store: SecureTokenStore(),
     errorParser: const DefaultServerErrorParser(),
-    refreshEndpoint: Endpoints.login,
+    refreshEndpoint: Endpoints.authRefresh,
     localeResolver: () => ref.read(localeRepositoryProvider).getLanguage(),
     extraInterceptors: const [],
     logger: logger,

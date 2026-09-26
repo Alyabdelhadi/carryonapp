@@ -18,6 +18,10 @@ abstract interface class CatalogRepository {
 
   Future<Result<AppVersionInfo, BusinessFailure>> appVersion();
 
+  /// Weights and rewards the admin set for the app's quick picks. A list
+  /// the server does not return (or returns empty) keeps its default.
+  Future<Result<QuickPicks, BusinessFailure>> quickPicks();
+
   Future<Result<AppSettings, BusinessFailure>> appSettings();
 
   Future<Result<HomeStats, BusinessFailure>> homeStats();

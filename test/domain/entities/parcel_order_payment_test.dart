@@ -28,10 +28,7 @@ void main() {
   group('OrderPaymentStatus.fromWire', () {
     test('maps every backend value', () {
       for (final status in OrderPaymentStatus.values) {
-        expect(
-          OrderPaymentStatus.fromWire(status.wire, online: true),
-          status,
-        );
+        expect(OrderPaymentStatus.fromWire(status.wire, online: true), status);
       }
     });
 
