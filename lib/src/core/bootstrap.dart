@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -35,6 +36,14 @@ Future<ProviderContainer> bootstrap() async {
   } else {
     try {
       await Firebase.initializeApp();
+      // iOS drops a push that lands while the app is open unless asked to
+      // show it; Android shows them anyway.
+      await FirebaseMessaging.instance
+          .setForegroundNotificationPresentationOptions(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
       firebaseReady = true;
     } on Object catch (e) {
       Log.warning('Firebase not initialised, push disabled: $e');

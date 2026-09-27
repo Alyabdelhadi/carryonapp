@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 
 import '../../core/base/result.dart';
@@ -37,6 +39,20 @@ final class NotificationRepositoryImpl extends Repository
         settings.authorizationStatus == AuthorizationStatus.provisional;
   }
 
+  /// iOS: topic calls throw `apns-token-not-set` until APNs has handed the
+  /// app its token, which can land a moment after permission is granted
+  /// (and never without the `aps-environment` entitlement). Waits a few
+  /// seconds for it; true when it is there (always true off iOS).
+  Future<bool> _apnsReady() async {
+    if (!Platform.isIOS) return true;
+    for (var i = 0; i < 10; i++) {
+      if (await _fcm.getAPNSToken() != null) return true;
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    }
+    Log.warning('APNs token unavailable; push topics skipped');
+    return false;
+  }
+
   @override
   Future<Result<Unit, BusinessFailure>> enable({int? userId}) {
     return asyncGuard(() async {
@@ -52,6 +68,9 @@ final class NotificationRepositoryImpl extends Repository
       } on Object catch (e) {
         Log.warning('FCM token unavailable: $e');
       }
+      if (!await _apnsReady()) {
+        throw const ApiResponseException('Push notifications unavailable');
+      }
       await _fcm.subscribeToTopic(AppConfig.broadcastTopic);
       if (userId != null) {
         await _fcm.subscribeToTopic(AppConfig.userTopic(userId));
@@ -64,6 +83,8 @@ final class NotificationRepositoryImpl extends Repository
   Future<Result<Unit, BusinessFailure>> disable({int? userId}) {
     return asyncGuard(() async {
       _requireFirebase();
+      // no APNs token means this device was never subscribed: nothing to undo
+      if (!await _apnsReady()) return Unit.value;
       await _fcm.unsubscribeFromTopic(AppConfig.broadcastTopic);
       if (userId != null) {
         await _fcm.unsubscribeFromTopic(AppConfig.userTopic(userId));
@@ -76,6 +97,9 @@ final class NotificationRepositoryImpl extends Repository
   Future<Result<Unit, BusinessFailure>> subscribeUser(int userId) {
     return asyncGuard(() async {
       _requireFirebase();
+      if (!await _apnsReady()) {
+        throw const ApiResponseException('Push notifications unavailable');
+      }
       await _fcm.subscribeToTopic(AppConfig.userTopic(userId));
       return Unit.value;
     });
@@ -85,6 +109,7 @@ final class NotificationRepositoryImpl extends Repository
   Future<Result<Unit, BusinessFailure>> unsubscribeUser(int userId) {
     return asyncGuard(() async {
       _requireFirebase();
+      if (!await _apnsReady()) return Unit.value;
       await _fcm.unsubscribeFromTopic(AppConfig.userTopic(userId));
       return Unit.value;
     });
