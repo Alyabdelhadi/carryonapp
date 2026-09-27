@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/base/result.dart';
 import '../../../../core/extensions/localization.dart';
 import '../../../../domain/entities/entities.dart';
-import '../../../core/application_state/app_gate_provider/app_gate_provider.dart';
 import '../../../core/application_state/session_status_provider/session_status_provider.dart';
 import '../../../core/router/route_args.dart';
 import '../../../core/router/routes.dart';
@@ -15,6 +14,7 @@ import '../../../core/utils/formatters.dart';
 import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/loading_indicator.dart';
+import '../../../core/widgets/verified_only.dart';
 import '../../../core/widgets/login_required_view.dart';
 import '../riverpod/order_actions_provider.dart';
 import '../widgets/order_action_bar.dart';
@@ -132,10 +132,7 @@ class _OrderDetailBodyState extends ConsumerState<_OrderDetailBody> {
 
   Future<void> _accept(int userId) async {
     final l10n = context.l10n;
-    if (ref.read(isUnderReviewProvider)) {
-      AppFeedback.toast(context, l10n.idvUnderReviewSnack);
-      return;
-    }
+    if (!ensureIdentityVerified(context, ref)) return;
     final ok = await AppFeedback.confirm(
       context,
       title: l10n.pkgAcceptConfirmTitle,

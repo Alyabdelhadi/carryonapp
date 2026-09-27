@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/extensions/localization.dart';
 import '../../../../domain/entities/entities.dart';
-import '../../../core/application_state/app_settings_provider/app_settings_provider.dart';
 import '../../../core/extensions/app_texts_extension.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
@@ -24,10 +23,10 @@ import '../widgets/terms_checkbox.dart';
 const _defaultCountryName = 'Lebanon';
 
 /// Account creation: name, phone with country code, email, password, a
-/// selfie and an identity document, and the terms consent. Submitting runs
-/// the identity check and then creates the account. In live verification
-/// mode only the selfie (profile photo) is asked for: the identity check
-/// happens afterwards on Shufti's page (see `VerifyIdentityPage`).
+/// selfie (the profile photo) and the terms consent. No identity check
+/// runs here: the user can browse right away and verifies (Shufti live
+/// page or manual review, see `VerifyIdentityPage`) the first time they
+/// try to send, receive or carry.
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
 
@@ -44,7 +43,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   Country? _pickedCountry;
   PickedDocument? _selfie;
-  PickedDocument? _identity;
   bool _agreed = false;
 
   @override
@@ -76,20 +74,9 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    final live = ref.read(appSettingsProvider).value?.shuftiLive ?? false;
     final selfie = _selfie;
-    final identity = live ? null : _identity;
     if (selfie == null) {
-      AppFeedback.toast(
-        context,
-        live
-            ? context.l10n.authUploadSelfie
-            : context.l10n.authUploadBothDocuments,
-      );
-      return;
-    }
-    if (!live && identity == null) {
-      AppFeedback.toast(context, context.l10n.authUploadBothDocuments);
+      AppFeedback.toast(context, context.l10n.authUploadSelfie);
       return;
     }
     FocusScope.of(context).unfocus();
@@ -103,9 +90,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
             phone: _fullPhone(country),
             password: _password.text,
             selfiePath: selfie.path,
-            identityPath: identity?.path,
           ),
-          checksIdentity: !live,
         );
     if (!ok || !mounted) return;
     context.goNamed(Routes.account.name);
@@ -120,7 +105,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     final state = ref.watch(signupControllerProvider);
     final step = state.value;
     final isBusy = step != null;
-    final live = ref.watch(appSettingsProvider).value?.shuftiLive ?? false;
     final l10n = context.l10n;
 
     return Scaffold(
@@ -149,22 +133,16 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 password: _password,
                 country: country,
                 selfie: _selfie,
-                identity: _identity,
-                askIdentity: !live,
                 agreed: _agreed,
                 enabled: !isBusy,
                 onCountry: (c) => setState(() => _pickedCountry = c),
                 onSelfie: (f) => setState(() => _selfie = f),
-                onIdentity: (f) => setState(() => _identity = f),
                 onAgreed: (v) => setState(() => _agreed = v),
                 onSubmit: _submit,
               ),
             ),
           ),
-          if (isBusy)
-            Positioned.fill(
-              child: SignupProgressOverlay(step: step, checksIdentity: !live),
-            ),
+          if (isBusy) Positioned.fill(child: SignupProgressOverlay(step: step)),
         ],
       ),
     );
@@ -179,13 +157,10 @@ class _SignupForm extends ConsumerWidget {
     required this.password,
     required this.country,
     required this.selfie,
-    required this.identity,
-    required this.askIdentity,
     required this.agreed,
     required this.enabled,
     required this.onCountry,
     required this.onSelfie,
-    required this.onIdentity,
     required this.onAgreed,
     required this.onSubmit,
   });
@@ -196,15 +171,10 @@ class _SignupForm extends ConsumerWidget {
   final TextEditingController password;
   final Country? country;
   final PickedDocument? selfie;
-  final PickedDocument? identity;
-
-  /// False in live verification mode: the ID is scanned after signup.
-  final bool askIdentity;
   final bool agreed;
   final bool enabled;
   final ValueChanged<Country> onCountry;
   final ValueChanged<PickedDocument?> onSelfie;
-  final ValueChanged<PickedDocument?> onIdentity;
   final ValueChanged<bool> onAgreed;
   final VoidCallback onSubmit;
 
@@ -290,18 +260,6 @@ class _SignupForm extends ConsumerWidget {
             preferFrontCamera: true,
             enabled: enabled,
           ),
-          if (askIdentity) ...[
-            Gap(space.s12),
-            DocumentUploadTile(
-              icon: Icons.badge_outlined,
-              title: l10n.authIdentityTitle,
-              subtitle: l10n.authIdentitySubtitle,
-              file: identity,
-              onChanged: onIdentity,
-              allowPdf: true,
-              enabled: enabled,
-            ),
-          ],
           Gap(space.s16),
           TermsCheckbox(
             value: agreed,

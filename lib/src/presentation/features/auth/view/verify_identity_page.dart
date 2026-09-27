@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/extensions/localization.dart';
 import '../../../../domain/entities/entities.dart';
 import '../../../../domain/failures/business_failure.dart';
 import '../../../core/application_state/app_settings_provider/app_settings_provider.dart';
-import '../../../core/application_state/logout_provider/logout_provider.dart';
 import '../../../core/application_state/session_status_provider/session_status_provider.dart';
+import '../../../core/router/routes.dart';
 import '../../../core/theme/theme.dart';
 import '../../../core/widgets/feedback.dart';
 import '../../../core/widgets/section_card.dart';
@@ -18,17 +19,18 @@ import '../riverpod/verify_identity_controller.dart';
 import '../widgets/auth_page_layout.dart';
 import '../widgets/document_upload_tile.dart';
 
-/// The only screen a signed-in account sees until its identity is
-/// verified, while the admin has the Shufti check on (router gate
-/// `Routes.verifyIdentity`). Old accounts land here after updating the
-/// app; so do accounts whose last check was rejected. Logging out is the
-/// only other way out.
+/// Identity verification, opened from `VerifiedOnly` when an account that
+/// is not verified tries to send, receive or carry (signup runs no check).
+/// Closes itself once the account is verified or under review.
 ///
-/// In live mode (`AppSettings.shuftiLive`) there are no uploads: the page
-/// opens Shufti's own page in an in-app browser (live selfie with liveness
-/// check + ID scan) and asks the backend for the result when the user
-/// comes back (on resume, or with the "check result" button, since an iOS
-/// Safari sheet does not pause the app).
+/// The admin picks the method (`AppSettings.identityMethod`):
+/// - Shufti: no uploads, the page opens Shufti's own page in an in-app
+///   browser (live selfie with liveness check + ID scan) and asks the
+///   backend for the result when the user comes back (on resume, or with
+///   the "check result" button, since an iOS Safari sheet does not pause
+///   the app).
+/// - manual: the user uploads a selfie and a photo of the ID, and the
+///   account is under review until the admin decides.
 class VerifyIdentityPage extends ConsumerStatefulWidget {
   const VerifyIdentityPage({super.key});
 
@@ -95,6 +97,19 @@ class _VerifyIdentityPageState extends ConsumerState<VerifyIdentityPage> {
       IdentityStatus.none || null => l10n.idvLiveNotFinished,
     };
     if (message != null) AppFeedback.toast(context, message);
+    if (status == IdentityStatus.verified || status == IdentityStatus.pending) {
+      _close();
+    }
+  }
+
+  /// Back to the screen that asked for verification, which now shows the
+  /// new state.
+  void _close() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.goNamed(Routes.home.name);
+    }
   }
 
   Future<void> _submit() async {
@@ -114,6 +129,7 @@ class _VerifyIdentityPageState extends ConsumerState<VerifyIdentityPage> {
       context,
       user.isVerified ? l10n.idvVerifiedToast : l10n.idvUnderReviewSnack,
     );
+    _close();
   }
 
   @override
@@ -134,17 +150,17 @@ class _VerifyIdentityPageState extends ConsumerState<VerifyIdentityPage> {
     final starting = ref.watch(verifyIdentityControllerProvider).isLoading;
     final live = ref.watch(appSettingsProvider).value?.shuftiLive ?? false;
     final busy = starting || _checkingLive;
-    final loggingOut = ref.watch(logoutProvider).isLoading;
     final status = ref.watch(currentUserProvider)?.identityStatus;
     final space = context.dimensions.space;
     final l10n = context.l10n;
-    final enabled = !busy && !loggingOut;
+    final enabled = !busy;
     final declined =
         status == IdentityStatus.declined || status == IdentityStatus.invalid;
 
     return PopScope(
-      canPop: false,
+      canPop: !busy,
       child: Scaffold(
+        appBar: AppBar(),
         body: Stack(
           children: [
             AuthPageLayout(
@@ -192,7 +208,7 @@ class _VerifyIdentityPageState extends ConsumerState<VerifyIdentityPage> {
                         _Note(
                           icon: Icons.shield_outlined,
                           color: context.color.status.success,
-                          text: l10n.idvPrivacyNote,
+                          text: l10n.idvPrivacyNoteManual,
                         ),
                         Gap(space.s20),
                         FilledButton.icon(
@@ -206,13 +222,6 @@ class _VerifyIdentityPageState extends ConsumerState<VerifyIdentityPage> {
                         ),
                       ],
                     ),
-              footer: TextButton.icon(
-                onPressed: enabled
-                    ? () => ref.read(logoutProvider.notifier).call()
-                    : null,
-                icon: const Icon(Icons.logout_rounded),
-                label: Text(l10n.logout),
-              ),
             ),
             if (busy)
               Positioned.fill(

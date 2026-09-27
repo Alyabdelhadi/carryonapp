@@ -15,10 +15,12 @@
 //     --dart-define=CARRYON_ID=/path/passport.jpg
 //
 // Scenarios (the account's state is set on the backend beforehand):
-//   verify       unverified account -> Verify screen -> verified -> badge
+//   verify       unverified account, backend in manual mode -> browses ->
+//                "Send a package" asks to verify -> upload -> under review
 //   under_review pending account -> "Send a package" shows Under review
 //   update       newer store version -> Update required screen
 import 'package:carryon/main.dart' as app;
+import 'package:carryon/src/domain/entities/entities.dart';
 import 'package:carryon/src/presentation/core/widgets/glass_navigation_bar.dart';
 import 'package:carryon/src/presentation/features/auth/riverpod/verify_identity_controller.dart';
 import 'package:carryon/src/presentation/features/auth/view/verify_identity_page.dart';
@@ -49,33 +51,32 @@ void main() {
 
     switch (_scenario) {
       case 'verify':
+        // signed in and browsing; the prompt comes with the first send
+        await _pumpUntil(tester, _navLabel('Home'));
+        await tester.tap(_navLabel('Home'));
+        await _pumpUntil(tester, find.text('Send a package'));
+        await _settle(tester, 2);
+        await tester.tap(find.text('Send a package'));
         await _pumpUntil(tester, find.text('Verify your identity'));
+        _mark('verify-prompt');
+        await _settle(tester, 3);
+        await tester.tap(find.text('Verify now'));
+        await _pumpUntil(tester, find.byType(VerifyIdentityPage));
         _mark('verify-screen');
-        await _settle(tester, 4);
+        await _settle(tester, 3);
 
+        // manual review on the backend: the upload puts the account
+        // under review and the page closes
         final container = ProviderScope.containerOf(
           tester.element(find.byType(VerifyIdentityPage)),
         );
-        final started = DateTime.now();
-        final pending = container
+        final user = await container
             .read(verifyIdentityControllerProvider.notifier)
             .submit(selfiePath: _selfie, identityPath: _identity);
-        await _pumpUntil(
-          tester,
-          find.textContaining('Verifying your identity'),
-        );
-        _mark('verifying-overlay');
-        await _settle(tester, 3);
-        await _pumpUntil(tester, _navLabel('Account'), timeout: 150);
-        final user = await pending;
-        final seconds = DateTime.now().difference(started).inSeconds;
-        _mark('home status=${user?.identityStatus.name} seconds=$seconds');
-        expect(user?.isVerified, isTrue);
-        await _settle(tester, 3);
-
-        await tester.tap(_navLabel('Account'));
-        await _pumpUntil(tester, find.text('Verified'));
-        _mark('account-badge');
+        _mark('submitted status=${user?.identityStatus.name}');
+        expect(user?.identityStatus, IdentityStatus.pending);
+        await _pumpUntil(tester, find.text('Account under review'));
+        _mark('under-review');
         await _settle(tester, 6);
 
       case 'under_review':
@@ -100,11 +101,7 @@ void main() {
 /// identity gate then decides where the user lands.
 Future<void> _signInIfNeeded(WidgetTester tester) async {
   final login = _navLabel('Login');
-  final landed = [
-    login,
-    _navLabel('Account'),
-    find.text('Verify your identity'),
-  ];
+  final landed = [login, _navLabel('Account')];
   await _pumpUntilAny(tester, landed);
   if (login.evaluate().isEmpty) return;
   await tester.tap(login);

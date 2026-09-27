@@ -74,7 +74,7 @@ GoRouter goRouter(Ref ref) {
         path: Routes.verifyIdentity.path,
         name: Routes.verifyIdentity.name,
         pageBuilder: (context, state) =>
-            const NoTransitionPage(child: VerifyIdentityPage()),
+            const MaterialPage(child: VerifyIdentityPage()),
       ),
       _shellRoutes(ref),
       ..._authRoutes(ref),

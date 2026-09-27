@@ -7,19 +7,12 @@ import '../../../core/widgets/section_card.dart';
 import '../../../core/widgets/text/typography.dart';
 import '../riverpod/signup_controller.dart';
 
-/// The blocking progress card shown while the signup runs, listing the two
-/// steps of the original flow ("Verifying identity...", then "Creating
-/// account...") with the current one highlighted. Live verification mode
-/// has no identity step at signup, so only the second row shows.
+/// The blocking progress card shown while the signup runs, listing its
+/// steps with the current one highlighted.
 class SignupProgressOverlay extends StatelessWidget {
-  const SignupProgressOverlay({
-    super.key,
-    required this.step,
-    this.checksIdentity = true,
-  });
+  const SignupProgressOverlay({super.key, required this.step});
 
   final SignupStep step;
-  final bool checksIdentity;
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +29,6 @@ class SignupProgressOverlay extends StatelessWidget {
               children: [
                 const CircularProgressIndicator(),
                 Gap(space.s20),
-                if (checksIdentity) ...[
-                  _StepRow(
-                    label: context.l10n.authVerifyingIdentity,
-                    state: _stateFor(SignupStep.verifyingIdentity),
-                  ),
-                  Gap(space.s8),
-                ],
                 _StepRow(
                   label: context.l10n.authCreatingAccount,
                   state: _stateFor(SignupStep.creatingAccount),

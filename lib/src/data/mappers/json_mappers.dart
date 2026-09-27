@@ -395,7 +395,15 @@ abstract final class CatalogMapper {
     shuftiEnabled: j.containsKey('shufti_enabled')
         ? Json.toBool(j['shufti_enabled'])
         : true,
-    shuftiLive: Json.toBool(j['shufti_live']),
+    identityMethod: switch (Json.toStr(j['identity_method'])) {
+      'shufti' => IdentityMethod.shufti,
+      'manual' => IdentityMethod.manual,
+      // backends from before identity_method
+      _ =>
+        Json.toBool(j['shufti_live'])
+            ? IdentityMethod.shufti
+            : IdentityMethod.manual,
+    },
     payments: j['payments'] is Map
         ? paymentRules(Json.asMap(j['payments']))
         : const PaymentRules(),

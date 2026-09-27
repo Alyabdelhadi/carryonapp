@@ -185,22 +185,31 @@ class AppVersionInfo {
   final String? ios;
 }
 
+/// How an account proves its identity (admin choice `identity_method`).
+enum IdentityMethod {
+  /// Live on Shufti's own page: selfie with liveness check + ID scan.
+  shufti,
+
+  /// A selfie and a photo of the ID, approved by hand by the admin.
+  manual,
+}
+
 /// Admin-managed runtime switches (`/appSettings`).
 class AppSettings {
   const AppSettings({
     this.shuftiEnabled = true,
-    this.shuftiLive = false,
+    this.identityMethod = IdentityMethod.manual,
     this.payments = const PaymentRules(),
   });
 
-  /// When false, signup skips the Shufti identity check and only uploads
-  /// the photos for manual review.
+  /// Whether accounts must verify their identity before they can send,
+  /// receive or carry packages. Nothing is checked at signup either way.
   final bool shuftiEnabled;
 
-  /// With [shuftiEnabled]: verification happens live on Shufti's own page
-  /// (selfie with liveness check + ID scan) instead of uploaded photos,
-  /// and signup asks for no ID document.
-  final bool shuftiLive;
+  /// With [shuftiEnabled]: how the account verifies.
+  final IdentityMethod identityMethod;
+
+  bool get shuftiLive => identityMethod == IdentityMethod.shufti;
 
   final PaymentRules payments;
 }

@@ -99,8 +99,9 @@ enum IdentityGate {
   /// or carry packages.
   underReview,
 
-  /// Never verified (old account) or the last attempt was rejected: the
-  /// app only shows the verification screen.
+  /// Never verified (new or old account) or the last attempt was
+  /// rejected: the user can browse, and is sent to the verification
+  /// screen when they try to send, receive or carry.
   required,
 }
 

@@ -5,10 +5,10 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../../domain/entities/entities.dart';
 import '../../../core/application_state/session_status_provider/session_status_provider.dart';
 
-/// The two steps the original signup showed while working: the Shufti
-/// identity check, then the account creation. `SignupUseCase` runs both in
-/// one call, so the UI lists both and highlights the first while waiting.
-enum SignupStep { verifyingIdentity, creatingAccount }
+/// What the signup shows while working. Signup runs no identity check:
+/// the account verifies later (`VerifyIdentityPage`), before its first
+/// send, receive or carry.
+enum SignupStep { creatingAccount }
 
 /// Submits the signup form. `AsyncData(step)` with a non-null step is the
 /// in-flight state (loading), `AsyncData(null)` is idle, `AsyncError`
@@ -23,14 +23,8 @@ class SignupController extends AsyncNotifier<SignupStep?> {
   Future<SignupStep?> build() async => null;
 
   /// Resolves true when the account was created and the session stored.
-  /// [checksIdentity] is false in live verification mode, where signup
-  /// only creates the account.
-  Future<bool> signup(SignupInput input, {bool checksIdentity = true}) async {
-    state = AsyncData(
-      checksIdentity
-          ? SignupStep.verifyingIdentity
-          : SignupStep.creatingAccount,
-    );
+  Future<bool> signup(SignupInput input) async {
+    state = const AsyncData(SignupStep.creatingAccount);
     final result = await ref.read(signupUseCaseProvider).call(input);
     if (!ref.mounted) return false;
     switch (result) {

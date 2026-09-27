@@ -26,7 +26,8 @@ final appUpdateProvider = FutureProvider<AppUpdateDecision>((ref) async {
       .call(currentVersion: currentVersion, isIos: Platform.isIOS);
 });
 
-/// What the identity check allows the signed-in user to do. Re-evaluated
+/// What the identity check allows the signed-in user to do (browsing is
+/// always allowed; see `VerifiedOnly`). Re-evaluated
 /// on login, signup, logout, after a verification attempt, on an identity
 /// push, and when the app resumes while under review.
 final identityGateProvider = FutureProvider<IdentityGate>((ref) async {
@@ -38,13 +39,7 @@ final identityGateProvider = FutureProvider<IdentityGate>((ref) async {
       .call(shuftiEnabled: settings.shuftiEnabled);
 });
 
-/// True while a signed-in user's check is still with Shufti: browsing is
-/// allowed, sending, receiving and carrying packages are not.
-final isUnderReviewProvider = Provider<bool>((ref) {
-  return ref.watch(identityGateProvider).value == IdentityGate.underReview;
-});
-
-/// The "Verified" badge shows only while the admin has the check on.
+/// The "Verified" badge shows only while the admin requires verification.
 final showVerifiedBadgeProvider = Provider<bool>((ref) {
   return ref.watch(appSettingsProvider).value?.shuftiEnabled ?? false;
 });
