@@ -17,7 +17,6 @@ import '../widgets/country_code_button.dart';
 import '../model/document_normalizer.dart';
 import '../widgets/document_upload_tile.dart';
 import '../widgets/password_field.dart';
-import '../widgets/signup_progress_overlay.dart';
 import '../widgets/terms_checkbox.dart';
 
 const _defaultCountryName = 'Lebanon';
@@ -102,9 +101,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
       if (next case AsyncError(:final error)) AppFeedback.error(context, error);
     });
     final country = _country(ref.watch(countriesProvider).value ?? const []);
-    final state = ref.watch(signupControllerProvider);
-    final step = state.value;
-    final isBusy = step != null;
+    final isBusy = ref.watch(signupControllerProvider).isLoading;
     final l10n = context.l10n;
 
     return Scaffold(
@@ -119,31 +116,26 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     : context.goNamed(Routes.home.name),
         ),
       ),
-      body: Stack(
-        children: [
-          AuthPageLayout(
-            title: ref.texts.get('signup_title', l10n.authSignupTitle),
-            subtitle: ref.texts.get('signup_desc', l10n.authSignupSubtitle),
-            form: Form(
-              key: _formKey,
-              child: _SignupForm(
-                name: _name,
-                phone: _phone,
-                email: _email,
-                password: _password,
-                country: country,
-                selfie: _selfie,
-                agreed: _agreed,
-                enabled: !isBusy,
-                onCountry: (c) => setState(() => _pickedCountry = c),
-                onSelfie: (f) => setState(() => _selfie = f),
-                onAgreed: (v) => setState(() => _agreed = v),
-                onSubmit: _submit,
-              ),
-            ),
+      body: AuthPageLayout(
+        title: ref.texts.get('signup_title', l10n.authSignupTitle),
+        subtitle: ref.texts.get('signup_desc', l10n.authSignupSubtitle),
+        form: Form(
+          key: _formKey,
+          child: _SignupForm(
+            name: _name,
+            phone: _phone,
+            email: _email,
+            password: _password,
+            country: country,
+            selfie: _selfie,
+            agreed: _agreed,
+            isLoading: isBusy,
+            onCountry: (c) => setState(() => _pickedCountry = c),
+            onSelfie: (f) => setState(() => _selfie = f),
+            onAgreed: (v) => setState(() => _agreed = v),
+            onSubmit: _submit,
           ),
-          if (isBusy) Positioned.fill(child: SignupProgressOverlay(step: step)),
-        ],
+        ),
       ),
     );
   }
@@ -158,7 +150,7 @@ class _SignupForm extends ConsumerWidget {
     required this.country,
     required this.selfie,
     required this.agreed,
-    required this.enabled,
+    required this.isLoading,
     required this.onCountry,
     required this.onSelfie,
     required this.onAgreed,
@@ -172,7 +164,7 @@ class _SignupForm extends ConsumerWidget {
   final Country? country;
   final PickedDocument? selfie;
   final bool agreed;
-  final bool enabled;
+  final bool isLoading;
   final ValueChanged<Country> onCountry;
   final ValueChanged<PickedDocument?> onSelfie;
   final ValueChanged<bool> onAgreed;
@@ -185,6 +177,7 @@ class _SignupForm extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final space = context.dimensions.space;
     final l10n = context.l10n;
+    final enabled = !isLoading;
     return AutofillGroup(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -273,7 +266,16 @@ class _SignupForm extends ConsumerWidget {
           FilledButton.icon(
             onPressed: enabled && agreed ? onSubmit : null,
             iconAlignment: IconAlignment.end,
-            icon: const Icon(Icons.arrow_forward_rounded),
+            icon: isLoading
+                ? SizedBox(
+                    width: context.dimensions.size.iconSmall,
+                    height: context.dimensions.size.iconSmall,
+                    child: CircularProgressIndicator(
+                      strokeWidth: context.dimensions.border.lg,
+                      color: context.color.text.onPrimary,
+                    ),
+                  )
+                : const Icon(Icons.arrow_forward_rounded),
             label: Text(ref.texts.get('signup_btn', l10n.signUp)),
           ),
         ],

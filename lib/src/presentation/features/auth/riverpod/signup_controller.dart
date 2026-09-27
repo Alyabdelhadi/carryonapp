@@ -5,26 +5,21 @@ import '../../../../core/di/dependency_injection.dart';
 import '../../../../domain/entities/entities.dart';
 import '../../../core/application_state/session_status_provider/session_status_provider.dart';
 
-/// What the signup shows while working. Signup runs no identity check:
-/// the account verifies later (`VerifyIdentityPage`), before its first
-/// send, receive or carry.
-enum SignupStep { creatingAccount }
-
-/// Submits the signup form. `AsyncData(step)` with a non-null step is the
-/// in-flight state (loading), `AsyncData(null)` is idle, `AsyncError`
-/// carries the failure to show.
+/// Submits the signup form. Signup runs no identity check: the account
+/// verifies later (`VerifyIdentityPage`), before its first send, receive
+/// or carry.
 final signupControllerProvider =
-    AsyncNotifierProvider.autoDispose<SignupController, SignupStep?>(
+    AsyncNotifierProvider.autoDispose<SignupController, void>(
       SignupController.new,
     );
 
-class SignupController extends AsyncNotifier<SignupStep?> {
+class SignupController extends AsyncNotifier<void> {
   @override
-  Future<SignupStep?> build() async => null;
+  Future<void> build() async {}
 
   /// Resolves true when the account was created and the session stored.
   Future<bool> signup(SignupInput input) async {
-    state = const AsyncData(SignupStep.creatingAccount);
+    state = const AsyncLoading();
     final result = await ref.read(signupUseCaseProvider).call(input);
     if (!ref.mounted) return false;
     switch (result) {
